@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <title>Flux video downloader</title>
+  <defs>
+    <linearGradient id="purple" x1="8" y1="4" x2="58" y2="64" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#C1A1FF"/>
+      <stop offset="1" stop-color="#8057EF"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="18" fill="url(#purple)"/>
+  <g stroke="white" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
+    <path d="m32 13 21 11-21 11-21-11 21-11Z"/>
+    <path d="m11 33 21 11 21-11M11 42l21 11 21-11"/>
+  </g>
+</svg>
