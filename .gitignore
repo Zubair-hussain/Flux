@@ -1,0 +1,10 @@
+node_modules/
+.next/
+coverage/
+downloads/
+.env*
+!.env.example
+test-results/
+playwright-report/
+*.tsbuildinfo
+.tools/
