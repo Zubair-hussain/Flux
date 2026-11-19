@@ -18,11 +18,23 @@ import {
 } from "./policy";
 import { qualities, type Quality } from "./platforms";
 import type { Job, VideoInfo } from "./types";
+import { AsyncCache } from "./async-cache";
 
 const exec = promisify(execFile);
 const root = path.join(process.cwd(), "downloads");
-const state = globalThis as typeof globalThis & { fluxActive?: Set<string> };
+const state = globalThis as typeof globalThis & {
+  fluxActive?: Set<string>;
+  fluxInspectionCache?: AsyncCache<VideoInfo>;
+  fluxJobListCache?: AsyncCache<ReturnType<typeof publicJob>[]>;
+};
 const active = (state.fluxActive ??= new Set<string>());
+const inspections = (state.fluxInspectionCache ??= new AsyncCache<VideoInfo>(
+  60_000,
+  100,
+));
+const jobLists = (state.fluxJobListCache ??= new AsyncCache<
+  ReturnType<typeof publicJob>[]
+>(2_000, 1));
 async function run(args: string[], timeout = 60000) {
   const binary = process.env.YTDLP_PATH || process.env.PYTHON_PATH || "python";
   const prefix = process.env.YTDLP_PATH ? [] : ["-m", "yt_dlp"];
@@ -65,6 +77,10 @@ async function run(args: string[], timeout = 60000) {
 }
 export async function inspectVideo(input: unknown): Promise<VideoInfo> {
   const { url, platform } = validateUrl(input);
+  // Every caller still passes URL policy checks, including on a cache hit.
+  return inspections.get(url, () => extractVideo(url, platform));
+}
+async function extractVideo(url: string, platform: string): Promise<VideoInfo> {
   const info = JSON.parse(
     await run(["--dump-single-json", "--skip-download", "--", url]),
   );
@@ -111,6 +127,7 @@ async function save(job: Job) {
   const temp = `${jobPath(job.id)}.${randomUUID()}.tmp`;
   await writeFile(temp, JSON.stringify(job), "utf8");
   await rename(temp, jobPath(job.id));
+  jobLists.clear();
 }
 export async function getJob(id: string): Promise<Job> {
   if (!/^[a-f0-9-]{36}$/.test(id))
@@ -129,6 +146,9 @@ export async function getJob(id: string): Promise<Job> {
   return job;
 }
 export async function listJobs() {
+  return jobLists.get("recent", readRecentJobs);
+}
+async function readRecentJobs() {
   await mkdir(root, { recursive: true });
   const names = (await readdir(root)).filter((n) =>
     /^[a-f0-9-]{36}\.json$/.test(n),
@@ -184,6 +204,8 @@ async function processJob(job: Job, url: string) {
     await mkdir(folder, { recursive: true });
     await run(
       [
+        "--concurrent-fragments",
+        "4",
         "--max-filesize",
         "4G",
         "--match-filter",

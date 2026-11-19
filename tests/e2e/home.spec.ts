@@ -1,11 +1,71 @@
 import { test, expect } from "@playwright/test";
+test("reduces idle polling, pauses hidden tabs, and refreshes on return", async ({
+  page,
+}) => {
+  await page.clock.install();
+  let requests = 0;
+  await page.route("**/api/downloads", (route) => {
+    requests += 1;
+    return route.fulfill({
+      json: [
+        {
+          id: "completed",
+          title: `Completed fixture ${requests}`,
+          platform: "YouTube",
+          quality: 720,
+          status: "complete",
+          createdAt: "2026-11-19T00:00:00Z",
+        },
+      ],
+    });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: /My downloads/ }).click();
+  await expect(
+    page.getByRole("heading", { name: /Completed fixture/ }),
+  ).toBeVisible();
+  const initialRequests = requests;
+  await expect(
+    page.getByRole("heading", { name: /Completed fixture/ }),
+  ).toHaveText(`Completed fixture ${initialRequests}`);
+  await page.clock.fastForward(10000);
+  expect(requests).toBe(initialRequests);
+  await page.clock.fastForward(6000);
+  await expect(
+    page.getByRole("heading", { name: /Completed fixture/ }),
+  ).toHaveText(`Completed fixture ${initialRequests + 1}`);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", {
+      value: true,
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await page.clock.fastForward(60000);
+  expect(requests).toBe(initialRequests + 1);
+  await page.evaluate(() => {
+    Object.defineProperty(document, "hidden", {
+      value: false,
+      configurable: true,
+    });
+    document.dispatchEvent(new Event("visibilitychange"));
+  });
+  await expect.poll(() => requests).toBe(initialRequests + 2);
+});
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/downloads", (route) => route.fulfill({ json: [] }));
 });
 test("homepage is responsive and platform shortcuts focus the URL input", async ({
   page,
 }) => {
+  const externalFonts: string[] = [];
+  page.on("request", (request) => {
+    if (/fonts\.(googleapis|gstatic)\.com/.test(request.url()))
+      externalFonts.push(request.url());
+  });
   await page.goto("/");
+  await page.evaluate(() => document.fonts.ready);
+  expect(externalFonts).toEqual([]);
   await expect(
     page.getByRole("heading", { name: "Great videos. Yours to keep." }),
   ).toBeVisible();
@@ -22,6 +82,15 @@ test("homepage is responsive and platform shortcuts focus the URL input", async 
   });
 });
 test("inspects source qualities and starts a download", async ({ page }) => {
+  let created = false;
+  const job = {
+    id: "test",
+    title: "Mountain sunrise",
+    platform: "YouTube",
+    quality: 2160,
+    status: "queued",
+    createdAt: new Date().toISOString(),
+  };
   await page.route("**/api/inspect", (route) =>
     route.fulfill({
       json: {
@@ -34,21 +103,13 @@ test("inspects source qualities and starts a download", async ({ page }) => {
       },
     }),
   );
-  await page.route("**/api/downloads", (route) =>
-    route.request().method() === "POST"
-      ? route.fulfill({
-          status: 202,
-          json: {
-            id: "test",
-            title: "Mountain sunrise",
-            platform: "YouTube",
-            quality: 2160,
-            status: "queued",
-            createdAt: new Date().toISOString(),
-          },
-        })
-      : route.fulfill({ json: [] }),
-  );
+  await page.route("**/api/downloads", (route) => {
+    if (route.request().method() === "POST") {
+      created = true;
+      return route.fulfill({ status: 202, json: job });
+    }
+    return route.fulfill({ json: created ? [job] : [] });
+  });
   await page.goto("/");
   await page
     .getByLabel("Video URL", { exact: true })

@@ -25,17 +25,21 @@ import {
 import { platforms, qualityLabel, type Quality } from "@/lib/platforms";
 import type { Job, VideoInfo } from "@/lib/types";
 
-async function api<T>(url: string, body?: unknown): Promise<T> {
-  const response = await fetch(
-    url,
-    body
+async function api<T>(
+  url: string,
+  body?: unknown,
+  signal?: AbortSignal,
+): Promise<T> {
+  const response = await fetch(url, {
+    signal,
+    ...(body
       ? {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         }
-      : { cache: "no-store" },
-  );
+      : { cache: "no-store" }),
+  });
   const data = await response.json();
   if (!response.ok) throw new Error(data.error || "Request failed.");
   return data;
@@ -93,28 +97,53 @@ export default function Home() {
   >(null);
   const [notice, setNotice] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasActiveJobs = jobs.some(
+    (job) => job.status === "queued" || job.status === "downloading",
+  );
   useEffect(() => {
     const shared = new URLSearchParams(window.location.search).get("url");
     if (shared) setUrl(shared);
+  }, []);
+  useEffect(() => {
     let mounted = true;
-    const refresh = () =>
-      api<Job[]>("/api/downloads")
-        .then((data) => {
-          if (mounted) setJobs(data);
-        })
-        .catch(() => {
-          if (mounted)
-            setNotice(
-              "Cannot reach the local server. Keep Flux running to manage downloads.",
-            );
-        });
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    let refreshing = false;
+    const controller = new AbortController();
+    const refresh = async () => {
+      if (!mounted || document.hidden || refreshing) return;
+      clearTimeout(timer);
+      refreshing = true;
+      try {
+        const data = await api<Job[]>(
+          "/api/downloads",
+          undefined,
+          controller.signal,
+        );
+        if (mounted) setJobs(data);
+      } catch {
+        if (mounted)
+          setNotice(
+            "Cannot reach the local server. Keep Flux running to manage downloads.",
+          );
+      } finally {
+        refreshing = false;
+        if (mounted && !document.hidden)
+          timer = setTimeout(refresh, hasActiveJobs ? 2000 : 15000);
+      }
+    };
+    const visibilityChanged = () => {
+      clearTimeout(timer);
+      if (!document.hidden) void refresh();
+    };
     void refresh();
-    const timer = setInterval(refresh, 3000);
+    document.addEventListener("visibilitychange", visibilityChanged);
     return () => {
       mounted = false;
-      clearInterval(timer);
+      clearTimeout(timer);
+      controller.abort();
+      document.removeEventListener("visibilitychange", visibilityChanged);
     };
-  }, []);
+  }, [hasActiveJobs]);
   useEffect(() => {
     if (!modal) return;
     const close = (e: KeyboardEvent) => {

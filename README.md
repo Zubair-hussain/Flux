@@ -16,7 +16,9 @@ npm run dev
 
 Open **http://127.0.0.1:3000**. Paste a public video link, select an available resolution, start the download, then use **My downloads → Save file**. Files remain in the ignored `downloads/` folder. A missing engine produces setup instructions in the UI. Optional executable overrides are in `.env.example`.
 
-For a production local build: `npm run build`, then `npm start`. Keep this single-process server bound to loopback. Background jobs require a continuously running Node process; serverless/edge deployment is unsupported.
+For everyday use, stop the development server with Ctrl+C, run `npm run build` once, then `npm start`. This uses the optimized production server; `npm run dev` is for editing and has compilation overhead. Rebuild after source changes. Keep this single-process server bound to loopback. Background jobs require a continuously running Node process; serverless/edge deployment is unsupported.
+
+Successful inspections are reused for 60 seconds, including when starting a download. Duplicate simultaneous requests share one extraction. Idle pages check jobs every 15 seconds, active queues every 2 seconds, and hidden tabs pause polling. Fragmented media can fetch four fragments concurrently. See [performance measurements](docs/PERFORMANCE.md); repeat the metadata benchmark with `npm run benchmark` while Flux is running.
 
 ## Included
 

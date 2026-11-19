@@ -13,9 +13,12 @@
     "test:e2e": "playwright test",
     "format": "prettier --write src tests mcp extension scripts docs *.json *.ts *.md",
     "format:check": "prettier --check src tests mcp extension scripts docs *.json *.ts *.md",
-    "mcp": "tsx mcp/server.ts"
+    "mcp": "tsx mcp/server.ts",
+    "benchmark": "node scripts/benchmark.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/dm-sans": "^5.3.0",
+    "@fontsource-variable/manrope": "^5.3.0",
     "@modelcontextprotocol/sdk": "^1.25.0",
     "lucide-react": "^0.468.0",
     "next": "^16.0.0",

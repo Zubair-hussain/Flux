@@ -1,5 +1,7 @@
 # Verification map
 
+The performance regression checks in `tests/async-cache.test.ts` cover expiry, bounded retention, coalescing, failed-load retries, cloned results, and invalidation during pending loads. Engine tests verify cached preflight and job-list invalidation. Browser tests cover adaptive polling, hidden-tab suspension, and the removal of external font requests. Use `npm run benchmark` for a live metadata-only timing run.
+
 | File / area                 | Cases                                                                                                                                                                | Verification                                                                                                  |
 | --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
 | `src/lib/policy.ts`         | Every platform, HTTPS, credentials, spoofed domains, ports, malformed encoding, sexual URL terms, metadata flags/tags/categories, playlists, live, duration, quality | `tests/policy.test.ts`                                                                                        |
