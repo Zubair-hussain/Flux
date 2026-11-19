@@ -1,0 +1,11 @@
+# Content and download policy
+
+Sexual content is disallowed in Flux. The server blocks sexual terms in decoded URLs, titles, descriptions, tags, and categories, plus age_limit >= 18 and explicit NSFW metadata. A second yt-dlp match filter rejects age-restricted and live media during download. All API and MCP clients use the same checks.
+
+This is a **metadata-based MVP filter**, not a visual classifier. Missing, misleading, multilingual, or euphemistic metadata can evade it; incidental terms can also produce false positives. It cannot guarantee that every frame is free of sexual content. Public release with that guarantee requires independently evaluated visual/audio moderation before exposing any downloaded file, quarantine storage, abuse handling, and appropriate review. Do not describe this MVP as fully moderated.
+
+Only the listed HTTPS platform domains and their subdomains are accepted. Reject credentials, custom ports, malformed encodings, unknown hosts and URL tricks. yt-dlp runs without a shell, ignores machine configuration, and receives fixed arguments. Playlists, current live streams, DRM-only formats, files above the engine's 4 GiB limit when known, and videos longer than two hours are unsupported. Unknown-size media can exceed that estimate; this MVP has no filesystem quota. It never bypasses DRM, supplies sign-in cookies, or removes platform access controls.
+
+Only download content you own or have permission to save. Availability depends on the source, region, platform restrictions, and current yt-dlp extractors. A platform icon describes intended extractor coverage, not a guarantee that every URL works. Source redirects and extractor network requests are handled by yt-dlp; the domain allowlist alone is not a complete network sandbox. Keep the service bound to loopback and do not operate it as an unauthenticated public downloader.
+
+Completed files and job metadata remain in the ignored `downloads/` directory until manually removed while the server is stopped. This includes partial files from failed jobs. Interrupted jobs become failed after restart. At most two download/creation slots are allowed in a single Node process. Use one server instance. Standalone inspection is not globally rate limited. Production scaling, quotas, automatic retention, visual moderation, and durable workers are follow-up work.

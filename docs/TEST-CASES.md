@@ -1,0 +1,18 @@
+# Verification map
+
+| File / area | Cases | Verification |
+| --- | --- | --- |
+| `src/lib/policy.ts` | Every platform, HTTPS, credentials, spoofed domains, ports, malformed encoding, sexual URL terms, metadata flags/tags/categories, playlists, live, duration, quality | `tests/policy.test.ts` |
+| `src/lib/platforms.ts` | Platform host mapping and quality labels | `tests/policy.test.ts` |
+| `src/lib/http.ts` | Local origin, extension origin, remote rejection, private error redaction | `tests/http.test.ts` |
+| `src/lib/engine.ts` | Source metadata, DRM/audio exclusion, missing engine, extraction failure, successful job, missing output, restart, paths, unavailable quality | `tests/engine.test.ts` |
+| API route files | Inspect/create/list/status/error contracts; file readiness | `tests/routes.test.ts` |
+| `src/app/page.tsx` | Platform input focus, overflow, inspect → source quality → queue, error announcement, extension modal/Escape | `tests/e2e/home.spec.ts`, desktop + mobile |
+| Layout and CSS | Responsive screenshots and production build | Playwright screenshots + `npm run build` |
+| `mcp/server.ts` | Stdio initialization, tool discovery | MCP client smoke check; network tools share the covered API |
+| `extension/*` | Manifest V3, popup routing, supported/unsupported tabs | Manifest validation + popup smoke check; Chrome load-unpacked is a manual integration step |
+| Docs/config/type-only files | Links/commands/config validity | Review, TypeScript, build; no artificial line coverage |
+
+`npm test` measures backend/API source coverage with V8 and enforces statements/lines/functions ≥80%, branches ≥70%. HTML details: `coverage/index.html`; machine-readable summary: `coverage/coverage-summary.json`. UI and extension/MCP code are not included in that percentage; they have separate checks. The frontend E2E tests mock sources/jobs so they do not depend on platform network access or save copyrighted media. Engine unit tests mock subprocesses and storage, rather than downloading third-party videos.
+
+Live integration: inspect an authorized video, download an offered resolution, poll to complete, save the file, and verify dimensions/audio with FFprobe. Source access can fail in CI or without source sign-in; record those limits separately from deterministic test results.
