@@ -38,6 +38,6 @@ Tools: `inspect_video({url})`, `download_video({url,quality})`, `get_download({i
 | GET    | `/api/downloads/:id`      | Job status                                          |
 | GET    | `/api/downloads/:id/file` | streamed attachment, 409 until ready                |
 
-Resolutions: 720, 1080, 1440, 2160 (4K), 4320 (8K). The UI exposes only exact heights found on video formats. Errors: `{ "error": "message" }`. Policy failures return 403, unsupported sources 422, missing engine 503, busy queue 429. No server file paths appear in API job responses.
+Resolutions: 720, 1080, 1440, 2160 (4K), 4320 (8K). The UI uses the shorter frame dimension when both dimensions are known, supporting landscape and portrait sources without upscaling. Height is the fallback when width is missing. Errors: `{ "error": "message" }`. Policy failures return 403, unsupported sources 422, missing engine 503, busy queue 429. No server file paths appear in API job responses.
 
 This API is for trusted local clients. Do not expose it to a public network. There is no multi-user authentication or durable worker process in this MVP.

@@ -69,12 +69,20 @@ export async function inspectVideo(input: unknown): Promise<VideoInfo> {
     await run(["--dump-single-json", "--skip-download", "--", url]),
   );
   enforceContentPolicy(info);
-  const heights = (
-    info.formats as { height?: number; vcodec?: string; has_drm?: boolean }[]
+  const resolutions = (
+    info.formats as {
+      width?: number;
+      height?: number;
+      vcodec?: string;
+      has_drm?: boolean;
+    }[]
   )
     .filter((f) => f.vcodec !== "none" && !f.has_drm)
-    .map((f) => f.height || 0);
-  const available = qualities.filter((q) => heights.includes(q));
+    // Portrait videos use the short edge too: 720×1280 is a 720p source.
+    .map((f) =>
+      f.width && f.height ? Math.min(f.width, f.height) : f.height || 0,
+    );
+  const available = qualities.filter((q) => resolutions.includes(q));
   if (!available.length)
     throw new AppError(
       "No supported video resolution was found (720p–8K).",
@@ -181,7 +189,7 @@ async function processJob(job: Job, url: string) {
         "--match-filter",
         "!is_live & age_limit<?18",
         "--format",
-        `bv[height=${job.quality}]+ba/b[height=${job.quality}]`,
+        `bv[height=${job.quality}][width>=?${job.quality}]+ba/b[height=${job.quality}][width>=?${job.quality}]/bv[width=${job.quality}][height>${job.quality}]+ba/b[width=${job.quality}][height>${job.quality}]`,
         "--merge-output-format",
         "mkv",
         "--output",

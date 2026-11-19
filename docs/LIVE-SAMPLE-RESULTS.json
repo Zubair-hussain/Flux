@@ -1,0 +1,90 @@
+{
+  "checkedFrom": "Local Flux API; metadata inspection only, no media download",
+  "results": [
+    {
+      "platform": "YouTube",
+      "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      "checkedAt": "2026-11-19T10:40:29.067Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film",
+      "qualities": [720, 1080, 1440, 2160]
+    },
+    {
+      "platform": "TikTok",
+      "url": "https://www.tiktok.com/@nasa/video/7665075736742530317",
+      "checkedAt": "2026-11-19T10:40:29.107Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Something big just landed on TikTok.",
+      "qualities": [720, 1080]
+    },
+    {
+      "platform": "Instagram",
+      "url": "https://www.instagram.com/reel/C_bnaTAO2Ll/",
+      "checkedAt": "2026-11-19T10:40:29.108Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Video by kelliegerardi",
+      "qualities": [720]
+    },
+    {
+      "platform": "Reddit",
+      "url": "https://www.reddit.com/r/space/comments/r1cqou/dart_mission_launch/",
+      "checkedAt": "2026-11-19T10:40:34.645Z",
+      "status": "inspection failed",
+      "httpStatus": 422,
+      "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
+    },
+    {
+      "platform": "X / Twitter",
+      "url": "https://x.com/michaelnicollsx/status/2051498745251201193",
+      "checkedAt": "2026-11-19T10:40:34.646Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Michael Nicolls - Stunning first-sat views from @Starlink launch G10-38 on May 1, deplo...",
+      "qualities": [720, 1080]
+    },
+    {
+      "platform": "LinkedIn",
+      "url": "https://www.linkedin.com/posts/dwaynelawrence_nasa-space-astronomy-activity-7478151654790418433-Cnsj",
+      "checkedAt": "2026-11-19T10:40:34.647Z",
+      "status": "inspection failed",
+      "httpStatus": 422,
+      "error": "No supported video resolution was found (720p–8K)."
+    },
+    {
+      "platform": "Twitch",
+      "url": "https://clips.twitch.tv/ZanyBlazingOtterNomNom-86PFh3-7kWWyJhrs",
+      "checkedAt": "2026-11-19T10:40:38.212Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Liftoff of the Roman Space Telescope",
+      "qualities": [720, 2160]
+    },
+    {
+      "platform": "Vimeo",
+      "url": "https://vimeo.com/1084537",
+      "checkedAt": "2026-11-19T10:40:38.213Z",
+      "status": "inspection failed",
+      "httpStatus": 422,
+      "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
+    },
+    {
+      "platform": "Facebook",
+      "url": "https://www.facebook.com/NASA/videos/10154861046561772/",
+      "checkedAt": "2026-11-19T10:40:38.214Z",
+      "status": "inspection failed",
+      "httpStatus": 422,
+      "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
+    },
+    {
+      "platform": "Dailymotion",
+      "url": "https://www.dailymotion.com/video/xbxi4vu",
+      "checkedAt": "2026-11-19T10:40:40.808Z",
+      "status": "inspection failed",
+      "httpStatus": 422,
+      "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
+    }
+  ]
+}

@@ -1,0 +1,39 @@
+[
+  {
+    "platform": "YouTube",
+    "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ"
+  },
+  {
+    "platform": "TikTok",
+    "url": "https://www.tiktok.com/@nasa/video/7665075736742530317"
+  },
+  {
+    "platform": "Instagram",
+    "url": "https://www.instagram.com/reel/C_bnaTAO2Ll/"
+  },
+  {
+    "platform": "Reddit",
+    "url": "https://www.reddit.com/r/space/comments/r1cqou/dart_mission_launch/"
+  },
+  {
+    "platform": "X / Twitter",
+    "url": "https://x.com/michaelnicollsx/status/2051498745251201193"
+  },
+  {
+    "platform": "LinkedIn",
+    "url": "https://www.linkedin.com/posts/dwaynelawrence_nasa-space-astronomy-activity-7478151654790418433-Cnsj"
+  },
+  {
+    "platform": "Twitch",
+    "url": "https://clips.twitch.tv/ZanyBlazingOtterNomNom-86PFh3-7kWWyJhrs"
+  },
+  { "platform": "Vimeo", "url": "https://vimeo.com/1084537" },
+  {
+    "platform": "Facebook",
+    "url": "https://www.facebook.com/NASA/videos/10154861046561772/"
+  },
+  {
+    "platform": "Dailymotion",
+    "url": "https://www.dailymotion.com/video/xbxi4vu"
+  }
+]

@@ -115,7 +115,25 @@ describe("download engine", () => {
     expect((await downloadFile(job.id)).size).toBe(123);
     expect(await listJobs()).toHaveLength(1);
     const args = mocks.run.mock.calls[1][1];
-    expect(args).toContain("bv[height=2160]+ba/b[height=2160]");
+    expect(args).toContain(
+      "bv[height=2160][width>=?2160]+ba/b[height=2160][width>=?2160]/bv[width=2160][height>2160]+ba/b[width=2160][height>2160]",
+    );
+  });
+  it("recognizes portrait qualities without treating their long edge as resolution", async () => {
+    mocks.run.mockResolvedValue({
+      stdout: JSON.stringify({
+        ...metadata,
+        formats: [
+          { width: 720, height: 1280, vcodec: "avc1" },
+          { width: 1080, height: 1920, vcodec: "avc1" },
+          { width: 608, height: 1080, vcodec: "avc1" },
+          { width: 2160, height: 3840, vcodec: "avc1", has_drm: true },
+        ],
+      }),
+    });
+    expect(
+      (await inspectVideo("https://www.tiktok.com/@test/video/123")).qualities,
+    ).toEqual([720, 1080]);
   });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];
