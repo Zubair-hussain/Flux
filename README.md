@@ -26,7 +26,7 @@ For a production local build: `npm run build`, then `npm start`. Keep this singl
 - Download queue/status and streamed local files; two concurrent download slots, restart detection, no shell interpolation, no client-controlled filesystem paths.
 - [MCP / REST guide](docs/AGENTS.md) for agent clients, including Claude and Codex. Four tools inspect, download, list, and check status. Start the app first, then configure the stdio server (`npm run mcp`).
 - Chrome extension: open `chrome://extensions`, enable Developer mode, click **Load unpacked**, and select the `extension/` folder. Open a supported video tab, click the extension, then **Open in Flux**. No history permission, remote scripts, or automatic page access.
-- [Desktop/mobile wireframes](docs/WIREFRAMES.md), [test matrix](docs/TEST-CASES.md), and [delivery plan](docs/PLAN.md).
+- [Desktop/mobile wireframes](docs/WIREFRAMES.md), [test matrix](docs/TEST-CASES.md), [verification results](docs/VERIFICATION.md), and [delivery plan](docs/PLAN.md).
 
 ## Checks
 

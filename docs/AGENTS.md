@@ -11,7 +11,14 @@ Replace the path with the absolute path to this checkout. On Windows, use forwar
   "mcpServers": {
     "flux": {
       "command": "npx",
-      "args": ["--prefix", "C:/Users/Zubair Hussain/Desktop/Donloader", "exec", "--", "tsx", "C:/Users/Zubair Hussain/Desktop/Donloader/mcp/server.ts"]
+      "args": [
+        "--prefix",
+        "C:/Users/Zubair Hussain/Desktop/Donloader",
+        "exec",
+        "--",
+        "tsx",
+        "C:/Users/Zubair Hussain/Desktop/Donloader/mcp/server.ts"
+      ]
     }
   }
 }
@@ -23,13 +30,13 @@ Tools: `inspect_video({url})`, `download_video({url,quality})`, `get_download({i
 
 ## REST API
 
-| Method | Endpoint | Body / response |
-| --- | --- | --- |
-| POST | `/api/inspect` | `{ "url": "https://…" }` → VideoInfo |
-| POST | `/api/downloads` | `{ "url": "https://…", "quality": 2160 }` → 202 Job |
-| GET | `/api/downloads` | latest 50 jobs |
-| GET | `/api/downloads/:id` | Job status |
-| GET | `/api/downloads/:id/file` | streamed attachment, 409 until ready |
+| Method | Endpoint                  | Body / response                                     |
+| ------ | ------------------------- | --------------------------------------------------- |
+| POST   | `/api/inspect`            | `{ "url": "https://…" }` → VideoInfo                |
+| POST   | `/api/downloads`          | `{ "url": "https://…", "quality": 2160 }` → 202 Job |
+| GET    | `/api/downloads`          | latest 50 jobs                                      |
+| GET    | `/api/downloads/:id`      | Job status                                          |
+| GET    | `/api/downloads/:id/file` | streamed attachment, 409 until ready                |
 
 Resolutions: 720, 1080, 1440, 2160 (4K), 4320 (8K). The UI exposes only exact heights found on video formats. Errors: `{ "error": "message" }`. Policy failures return 403, unsupported sources 422, missing engine 503, busy queue 429. No server file paths appear in API job responses.
 

@@ -1,36 +1,74 @@
-import { beforeEach, expect, it, vi } from 'vitest';
-const engine = vi.hoisted(() => ({ inspectVideo: vi.fn(), createJob: vi.fn(), listJobs: vi.fn(), getJob: vi.fn(), publicJob: vi.fn((x: unknown) => x), downloadFile: vi.fn() }));
-vi.mock('../src/lib/engine', () => engine);
-vi.mock('node:fs', () => ({ createReadStream: () => Readable.from([Buffer.from('test-video')]) }));
-import { Readable } from 'node:stream';
-import { POST as inspect } from '../src/app/api/inspect/route';
-import { POST as create, GET as list } from '../src/app/api/downloads/route';
-import { GET as get } from '../src/app/api/downloads/[id]/route';
-import { GET as file } from '../src/app/api/downloads/[id]/file/route';
-import { AppError } from '../src/lib/policy';
-const request = (body?: unknown) => new Request('http://localhost:3000/api', body ? { method: 'POST', body: JSON.stringify(body) } : {});
-const context = { params: Promise.resolve({ id: 'abc' }) };
+import { beforeEach, expect, it, vi } from "vitest";
+const engine = vi.hoisted(() => ({
+  inspectVideo: vi.fn(),
+  createJob: vi.fn(),
+  listJobs: vi.fn(),
+  getJob: vi.fn(),
+  publicJob: vi.fn((x: unknown) => x),
+  downloadFile: vi.fn(),
+}));
+vi.mock("../src/lib/engine", () => engine);
+vi.mock("node:fs", () => ({
+  createReadStream: () => Readable.from([Buffer.from("test-video")]),
+}));
+import { Readable } from "node:stream";
+import { POST as inspect } from "../src/app/api/inspect/route";
+import { POST as create, GET as list } from "../src/app/api/downloads/route";
+import { GET as get } from "../src/app/api/downloads/[id]/route";
+import { GET as file } from "../src/app/api/downloads/[id]/file/route";
+import { AppError } from "../src/lib/policy";
+const request = (body?: unknown) =>
+  new Request(
+    "http://localhost:3000/api",
+    body ? { method: "POST", body: JSON.stringify(body) } : {},
+  );
+const context = { params: Promise.resolve({ id: "abc" }) };
 beforeEach(() => vi.clearAllMocks());
-it('inspects URLs and passes policy failures through', async () => {
-  engine.inspectVideo.mockResolvedValue({ title: 'A' }); expect(await (await inspect(request({ url: 'https://youtu.be/a' }))).json()).toEqual({ title: 'A' });
-  engine.inspectVideo.mockRejectedValue(new AppError('Blocked', 403)); expect((await inspect(request({ url: 'x' }))).status).toBe(403);
+it("inspects URLs and passes policy failures through", async () => {
+  engine.inspectVideo.mockResolvedValue({ title: "A" });
+  expect(
+    await (await inspect(request({ url: "https://youtu.be/a" }))).json(),
+  ).toEqual({ title: "A" });
+  engine.inspectVideo.mockRejectedValue(new AppError("Blocked", 403));
+  expect((await inspect(request({ url: "x" }))).status).toBe(403);
 });
-it('creates, lists and reads jobs', async () => {
-  engine.createJob.mockResolvedValue({ id: 'abc' }); expect((await create(request({ url: 'x', quality: 1080 }))).status).toBe(202);
-  engine.listJobs.mockResolvedValue([]); expect(await (await list(request())).json()).toEqual([]);
-  engine.getJob.mockResolvedValue({ id: 'abc' }); expect(await (await get(request(), context)).json()).toEqual({ id: 'abc' });
+it("creates, lists and reads jobs", async () => {
+  engine.createJob.mockResolvedValue({ id: "abc" });
+  expect((await create(request({ url: "x", quality: 1080 }))).status).toBe(202);
+  engine.listJobs.mockResolvedValue([]);
+  expect(await (await list(request())).json()).toEqual([]);
+  engine.getJob.mockResolvedValue({ id: "abc" });
+  expect(await (await get(request(), context)).json()).toEqual({ id: "abc" });
 });
-it('handles job errors and invalid JSON', async () => {
-  engine.createJob.mockRejectedValue(new AppError('Busy', 429)); expect((await create(request({ url: 'x' }))).status).toBe(429);
-  engine.listJobs.mockRejectedValue(new Error('private')); expect((await list(request())).status).toBe(500);
-  engine.getJob.mockRejectedValue(new AppError('Missing', 404)); expect((await get(request(), context)).status).toBe(404);
-  expect((await inspect(new Request('http://localhost:3000', { method: 'POST', body: '{' }))).status).toBe(500);
+it("handles job errors and invalid JSON", async () => {
+  engine.createJob.mockRejectedValue(new AppError("Busy", 429));
+  expect((await create(request({ url: "x" }))).status).toBe(429);
+  engine.listJobs.mockRejectedValue(new Error("private"));
+  expect((await list(request())).status).toBe(500);
+  engine.getJob.mockRejectedValue(new AppError("Missing", 404));
+  expect((await get(request(), context)).status).toBe(404);
+  expect(
+    (
+      await inspect(
+        new Request("http://localhost:3000", { method: "POST", body: "{" }),
+      )
+    ).status,
+  ).toBe(500);
 });
-it('returns file readiness errors', async () => { engine.downloadFile.mockRejectedValue(new AppError('Not ready', 409)); expect((await file(request(), context)).status).toBe(409); });
-it('streams a finished attachment with safe headers', async () => {
-  engine.downloadFile.mockResolvedValue({ file: '/local/video.mkv', size: 10, name: 'flux-test.mkv' });
+it("returns file readiness errors", async () => {
+  engine.downloadFile.mockRejectedValue(new AppError("Not ready", 409));
+  expect((await file(request(), context)).status).toBe(409);
+});
+it("streams a finished attachment with safe headers", async () => {
+  engine.downloadFile.mockResolvedValue({
+    file: "/local/video.mkv",
+    size: 10,
+    name: "flux-test.mkv",
+  });
   const response = await file(request(), context);
-  expect(response.headers.get('content-disposition')).toBe('attachment; filename="flux-test.mkv"');
-  expect(response.headers.get('x-content-type-options')).toBe('nosniff');
-  expect(await response.text()).toBe('test-video');
+  expect(response.headers.get("content-disposition")).toBe(
+    'attachment; filename="flux-test.mkv"',
+  );
+  expect(response.headers.get("x-content-type-options")).toBe("nosniff");
+  expect(await response.text()).toBe("test-video");
 });

@@ -1,7 +1,7 @@
 node_modules/
 .next/
 coverage/
-downloads/
+/downloads/
 .env*
 !.env.example
 test-results/

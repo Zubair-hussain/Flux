@@ -4,7 +4,12 @@
   "version": "0.1.0",
   "description": "Send the current public video to your local Flux workspace.",
   "permissions": ["activeTab"],
-  "action": {"default_popup": "popup.html", "default_title": "Open video in Flux"},
-  "icons": {"128": "icon.png"},
-  "content_security_policy": {"extension_pages": "script-src 'self'; object-src 'self'"}
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Open video in Flux"
+  },
+  "icons": { "128": "icon.png" },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
 }
