@@ -12,3 +12,6 @@ playwright-report/
 # Sightline audit checkout and reports
 .sightline/
 reports/
+packages/cli/dist/
+packages/cli/LICENSE
+packages/cli/LEGAL.md

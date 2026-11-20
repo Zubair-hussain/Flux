@@ -1,0 +1,56 @@
+{
+  "name": "flux-downloader",
+  "version": "1.0.0",
+  "description": "Download public videos from YouTube, TikTok, Instagram, X, LinkedIn, Twitch, Dailymotion and more in their original quality (720p to 8K). One cross-platform command, no account, no DRM bypass.",
+  "type": "module",
+  "bin": {
+    "flux": "dist/flux.mjs"
+  },
+  "files": [
+    "dist/flux.mjs",
+    "README.md",
+    "LICENSE",
+    "LEGAL.md"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
+  "os": [
+    "win32",
+    "darwin",
+    "linux"
+  ],
+  "keywords": [
+    "video-downloader",
+    "youtube-downloader",
+    "tiktok-downloader",
+    "instagram-downloader",
+    "twitter-video-downloader",
+    "x-video-downloader",
+    "linkedin-video-downloader",
+    "twitch-clip-downloader",
+    "dailymotion-downloader",
+    "4k",
+    "8k",
+    "yt-dlp",
+    "ffmpeg",
+    "cli",
+    "cross-platform",
+    "flux"
+  ],
+  "author": "Zubair Hussain (https://zubairhussain.xyz)",
+  "license": "MIT",
+  "homepage": "https://github.com/Zubair-hussain/Flux#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Zubair-hussain/Flux.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/Zubair-hussain/Flux/issues"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  }
+}

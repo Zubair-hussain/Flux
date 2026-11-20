@@ -16,9 +16,16 @@ import {
   validateQuality,
   validateUrl,
 } from "./policy";
-import { qualities, type Quality } from "./platforms";
+import type { Quality } from "./platforms";
 import type { Job, VideoInfo } from "./types";
 import { AsyncCache } from "./async-cache";
+import {
+  downloadSafetyArgs,
+  formatSelector,
+  sourceQualities,
+  ytdlpCommand,
+} from "./ytdlp";
+export { formatResolution } from "./ytdlp";
 
 const exec = promisify(execFile);
 const root = path.join(process.cwd(), "downloads");
@@ -39,26 +46,13 @@ const jobLists = (state.fluxJobListCache ??= new AsyncCache<
   ReturnType<typeof publicJob>[]
 >(2_000, 1));
 async function run(args: string[], timeout = 60000) {
-  const binary = process.env.YTDLP_PATH || process.env.PYTHON_PATH || "python";
-  const prefix = process.env.YTDLP_PATH ? [] : ["-m", "yt_dlp"];
+  const command = ytdlpCommand(args);
   try {
-    const result = await exec(
-      binary,
-      [
-        ...prefix,
-        "--ignore-config",
-        "--no-playlist",
-        "--no-warnings",
-        "--js-runtimes",
-        `node:${process.execPath}`,
-        "--socket-timeout",
-        "20",
-        "--retries",
-        "2",
-        ...args,
-      ],
-      { timeout, maxBuffer: 12 * 1024 * 1024, windowsHide: true },
-    );
+    const result = await exec(command.binary, command.args, {
+      timeout,
+      maxBuffer: 12 * 1024 * 1024,
+      windowsHide: true,
+    });
     return result.stdout;
   } catch (error) {
     const e = error as { code?: string; stderr?: string };
@@ -87,22 +81,6 @@ export async function inspectVideo(input: unknown): Promise<VideoInfo> {
   const { formatIds: _formatIds, ...info } = await inspect(input);
   return info;
 }
-/** Short-edge resolution of a format, using the URL/note label (".../mp4-720p-...") when dimensions are missing. */
-export function formatResolution(f: {
-  width?: number;
-  height?: number;
-  url?: string;
-  format_note?: string;
-}): { value: number; inferred: boolean } {
-  // Portrait videos use the short edge too: 720×1280 is a 720p source.
-  if (f.width && f.height)
-    return { value: Math.min(f.width, f.height), inferred: false };
-  if (f.height) return { value: f.height, inferred: false };
-  const label = `${f.format_note || ""} ${f.url || ""}`.match(
-    /(?:^|[^a-z0-9])(\d{3,4})p(?:[^a-z0-9]|$)/i,
-  );
-  return { value: label ? Number(label[1]) : 0, inferred: Boolean(label) };
-}
 async function extractVideo(
   url: string,
   platform: string,
@@ -111,36 +89,9 @@ async function extractVideo(
     await run(["--dump-single-json", "--skip-download", "--", url]),
   );
   enforceContentPolicy(info);
-  const formats = (
-    info.formats as {
-      format_id?: string;
-      width?: number;
-      height?: number;
-      vcodec?: string;
-      has_drm?: boolean;
-      url?: string;
-      format_note?: string;
-    }[]
-  ).filter((f) => f.vcodec !== "none" && !f.has_drm);
-  const resolutions = new Set<number>();
-  const formatIds: Partial<Record<Quality, string>> = {};
-  for (const f of formats) {
-    const { value, inferred } = formatResolution(f);
-    resolutions.add(value);
-    if (
-      inferred &&
-      f.format_id &&
-      /^[\w.-]+$/.test(f.format_id) &&
-      qualities.includes(value as Quality)
-    )
-      formatIds[value as Quality] = f.format_id;
-  }
-  const available = qualities.filter((q) => resolutions.has(q));
-  if (!available.length)
-    throw new AppError(
-      "No supported video resolution was found (720p–8K).",
-      422,
-    );
+  const { qualities: available, formatIds } = sourceQualities(
+    Array.isArray(info.formats) ? info.formats : [],
+  );
   let thumbnail: string | undefined;
   try {
     const u = new URL(info.thumbnail);
@@ -242,14 +193,9 @@ async function processJob(job: Job, url: string, labelledFormat?: string) {
     await mkdir(folder, { recursive: true });
     await run(
       [
-        "--concurrent-fragments",
-        "4",
-        "--max-filesize",
-        "4G",
-        "--match-filter",
-        "!is_live & age_limit<?18",
+        ...downloadSafetyArgs,
         "--format",
-        `bv[height=${job.quality}][width>=?${job.quality}]+ba/b[height=${job.quality}][width>=?${job.quality}]/bv[width=${job.quality}][height>${job.quality}]+ba/b[width=${job.quality}][height>${job.quality}]${labelledFormat ? `/${labelledFormat}` : ""}`,
+        formatSelector(job.quality, labelledFormat),
         "--merge-output-format",
         "mkv",
         "--output",

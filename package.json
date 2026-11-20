@@ -16,7 +16,8 @@
     "mcp": "tsx mcp/server.ts",
     "benchmark": "node scripts/benchmark.mjs",
     "audit": "node scripts/sightline-audit.mjs",
-    "demo:video": "node scripts/record-demo.mjs"
+    "demo:video": "node scripts/record-demo.mjs",
+    "build:cli": "node scripts/build-cli.mjs"
   },
   "dependencies": {
     "@fontsource-variable/dm-sans": "^5.3.0",
@@ -34,6 +35,7 @@
     "@types/react": "^19.2.0",
     "@types/react-dom": "^19.2.0",
     "@vitest/coverage-v8": "^5.1.1",
+    "esbuild": "^0.28.2",
     "prettier": "^3.10.1",
     "tsx": "^4.20.0",
     "typescript": "^5.9.0",
