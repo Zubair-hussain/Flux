@@ -24,11 +24,14 @@ const exec = promisify(execFile);
 const root = path.join(process.cwd(), "downloads");
 const state = globalThis as typeof globalThis & {
   fluxActive?: Set<string>;
-  fluxInspectionCache?: AsyncCache<VideoInfo>;
+  fluxInspectionCache?: AsyncCache<Inspection>;
   fluxJobListCache?: AsyncCache<ReturnType<typeof publicJob>[]>;
 };
 const active = (state.fluxActive ??= new Set<string>());
-const inspections = (state.fluxInspectionCache ??= new AsyncCache<VideoInfo>(
+// Internal inspection result: public video info plus format IDs for sources
+// (e.g. LinkedIn) whose resolution is only known from the media URL.
+type Inspection = VideoInfo & { formatIds?: Partial<Record<Quality, string>> };
+const inspections = (state.fluxInspectionCache ??= new AsyncCache<Inspection>(
   60_000,
   100,
 ));
@@ -61,7 +64,7 @@ async function run(args: string[], timeout = 60000) {
     const e = error as { code?: string; stderr?: string };
     if (e.code === "ENOENT" || e.stderr?.includes("No module named yt_dlp"))
       throw new AppError(
-        'Download engine missing. Run: python -m pip install -U "yt-dlp[default]"',
+        'Download engine missing. Run: python -m pip install -U "yt-dlp[default,curl-cffi]"',
         503,
       );
     if (e.stderr?.includes("ffmpeg"))
@@ -75,30 +78,64 @@ async function run(args: string[], timeout = 60000) {
     );
   }
 }
-export async function inspectVideo(input: unknown): Promise<VideoInfo> {
+async function inspect(input: unknown): Promise<Inspection> {
   const { url, platform } = validateUrl(input);
   // Every caller still passes URL policy checks, including on a cache hit.
   return inspections.get(url, () => extractVideo(url, platform));
 }
-async function extractVideo(url: string, platform: string): Promise<VideoInfo> {
+export async function inspectVideo(input: unknown): Promise<VideoInfo> {
+  const { formatIds: _formatIds, ...info } = await inspect(input);
+  return info;
+}
+/** Short-edge resolution of a format, using the URL/note label (".../mp4-720p-...") when dimensions are missing. */
+export function formatResolution(f: {
+  width?: number;
+  height?: number;
+  url?: string;
+  format_note?: string;
+}): { value: number; inferred: boolean } {
+  // Portrait videos use the short edge too: 720×1280 is a 720p source.
+  if (f.width && f.height)
+    return { value: Math.min(f.width, f.height), inferred: false };
+  if (f.height) return { value: f.height, inferred: false };
+  const label = `${f.format_note || ""} ${f.url || ""}`.match(
+    /(?:^|[^a-z0-9])(\d{3,4})p(?:[^a-z0-9]|$)/i,
+  );
+  return { value: label ? Number(label[1]) : 0, inferred: Boolean(label) };
+}
+async function extractVideo(
+  url: string,
+  platform: string,
+): Promise<Inspection> {
   const info = JSON.parse(
     await run(["--dump-single-json", "--skip-download", "--", url]),
   );
   enforceContentPolicy(info);
-  const resolutions = (
+  const formats = (
     info.formats as {
+      format_id?: string;
       width?: number;
       height?: number;
       vcodec?: string;
       has_drm?: boolean;
+      url?: string;
+      format_note?: string;
     }[]
-  )
-    .filter((f) => f.vcodec !== "none" && !f.has_drm)
-    // Portrait videos use the short edge too: 720×1280 is a 720p source.
-    .map((f) =>
-      f.width && f.height ? Math.min(f.width, f.height) : f.height || 0,
-    );
-  const available = qualities.filter((q) => resolutions.includes(q));
+  ).filter((f) => f.vcodec !== "none" && !f.has_drm);
+  const resolutions = new Set<number>();
+  const formatIds: Partial<Record<Quality, string>> = {};
+  for (const f of formats) {
+    const { value, inferred } = formatResolution(f);
+    resolutions.add(value);
+    if (
+      inferred &&
+      f.format_id &&
+      /^[\w.-]+$/.test(f.format_id) &&
+      qualities.includes(value as Quality)
+    )
+      formatIds[value as Quality] = f.format_id;
+  }
+  const available = qualities.filter((q) => resolutions.has(q));
   if (!available.length)
     throw new AppError(
       "No supported video resolution was found (720p–8K).",
@@ -119,6 +156,7 @@ async function extractVideo(url: string, platform: string): Promise<VideoInfo> {
     duration: Number(info.duration) || 0,
     thumbnail,
     qualities: available,
+    ...(Object.keys(formatIds).length ? { formatIds } : {}),
   };
 }
 const jobPath = (id: string) => path.join(root, `${id}.json`);
@@ -173,7 +211,7 @@ export async function createJob(input: unknown, requestedQuality: unknown) {
   const id = randomUUID();
   active.add(id);
   try {
-    const info = await inspectVideo(input);
+    const info = await inspect(input);
     if (!info.qualities.includes(quality))
       throw new AppError("This source does not offer the selected resolution.");
     const job: Job = {
@@ -185,7 +223,7 @@ export async function createJob(input: unknown, requestedQuality: unknown) {
       createdAt: new Date().toISOString(),
     };
     await save(job);
-    void processJob(job, info.url)
+    void processJob(job, info.url, info.formatIds?.[quality])
       .catch(() => {
         /* storage failures cannot be written back; restart detection handles interrupted records */
       })
@@ -196,7 +234,7 @@ export async function createJob(input: unknown, requestedQuality: unknown) {
     throw error;
   }
 }
-async function processJob(job: Job, url: string) {
+async function processJob(job: Job, url: string, labelledFormat?: string) {
   try {
     job.status = "downloading";
     await save(job);
@@ -211,7 +249,7 @@ async function processJob(job: Job, url: string) {
         "--match-filter",
         "!is_live & age_limit<?18",
         "--format",
-        `bv[height=${job.quality}][width>=?${job.quality}]+ba/b[height=${job.quality}][width>=?${job.quality}]/bv[width=${job.quality}][height>${job.quality}]+ba/b[width=${job.quality}][height>${job.quality}]`,
+        `bv[height=${job.quality}][width>=?${job.quality}]+ba/b[height=${job.quality}][width>=?${job.quality}]/bv[width=${job.quality}][height>${job.quality}]+ba/b[width=${job.quality}][height>${job.quality}]${labelledFormat ? `/${labelledFormat}` : ""}`,
         "--merge-output-format",
         "mkv",
         "--output",

@@ -180,6 +180,38 @@ describe("download engine", () => {
       (await inspectVideo("https://www.tiktok.com/@test/video/123")).qualities,
     ).toEqual([720, 1080]);
   });
+  it("reads resolution labels from media URLs when dimensions are missing (LinkedIn)", async () => {
+    mocks.run.mockImplementation(async (_binary, args: string[]) => ({
+      stdout: args.includes("--dump-single-json")
+        ? JSON.stringify({
+            ...metadata,
+            formats: [
+              {
+                format_id: "0",
+                url: "https://dms.licdn.com/playlist/vid/v2/x/mp4-640p-30fp-crf28/y",
+              },
+              {
+                format_id: "1",
+                url: "https://dms.licdn.com/playlist/vid/v2/x/mp4-720p-30fp-crf28/y",
+              },
+              { format_id: "2", url: "https://cdn.test/video-v2.mp4" },
+            ],
+          })
+        : "",
+    }));
+    const url = "https://www.linkedin.com/posts/test-activity-123";
+    const info = await inspectVideo(url);
+    expect(info.qualities).toEqual([720]);
+    expect(info).not.toHaveProperty("formatIds");
+    const job = await createJob(url, 720);
+    await vi.waitFor(async () =>
+      expect((await getJob(job.id)).status).toBe("complete"),
+    );
+    const args = mocks.run.mock.calls.find(([, a]) =>
+      a.includes("--format"),
+    )![1];
+    expect(args[args.indexOf("--format") + 1]).toMatch(/\/1$/);
+  });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];
     const job = await createJob("https://youtu.be/abc", 1080);

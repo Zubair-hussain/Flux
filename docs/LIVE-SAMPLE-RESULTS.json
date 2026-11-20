@@ -4,7 +4,7 @@
     {
       "platform": "YouTube",
       "url": "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
-      "checkedAt": "2026-11-19T10:40:29.067Z",
+      "checkedAt": "2026-11-20T10:53:40.099Z",
       "status": "inspection passed",
       "httpStatus": 200,
       "title": "Big Buck Bunny 60fps 4K - Official Blender Foundation Short Film",
@@ -13,7 +13,7 @@
     {
       "platform": "TikTok",
       "url": "https://www.tiktok.com/@nasa/video/7665075736742530317",
-      "checkedAt": "2026-11-19T10:40:29.107Z",
+      "checkedAt": "2026-11-20T10:53:40.252Z",
       "status": "inspection passed",
       "httpStatus": 200,
       "title": "Something big just landed on TikTok.",
@@ -22,7 +22,7 @@
     {
       "platform": "Instagram",
       "url": "https://www.instagram.com/reel/C_bnaTAO2Ll/",
-      "checkedAt": "2026-11-19T10:40:29.108Z",
+      "checkedAt": "2026-11-20T10:53:40.260Z",
       "status": "inspection passed",
       "httpStatus": 200,
       "title": "Video by kelliegerardi",
@@ -31,7 +31,7 @@
     {
       "platform": "Reddit",
       "url": "https://www.reddit.com/r/space/comments/r1cqou/dart_mission_launch/",
-      "checkedAt": "2026-11-19T10:40:34.645Z",
+      "checkedAt": "2026-11-20T10:53:52.615Z",
       "status": "inspection failed",
       "httpStatus": 422,
       "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
@@ -39,7 +39,7 @@
     {
       "platform": "X / Twitter",
       "url": "https://x.com/michaelnicollsx/status/2051498745251201193",
-      "checkedAt": "2026-11-19T10:40:34.646Z",
+      "checkedAt": "2026-11-20T10:53:52.617Z",
       "status": "inspection passed",
       "httpStatus": 200,
       "title": "Michael Nicolls - Stunning first-sat views from @Starlink launch G10-38 on May 1, deplo...",
@@ -48,15 +48,16 @@
     {
       "platform": "LinkedIn",
       "url": "https://www.linkedin.com/posts/dwaynelawrence_nasa-space-astronomy-activity-7478151654790418433-Cnsj",
-      "checkedAt": "2026-11-19T10:40:34.647Z",
-      "status": "inspection failed",
-      "httpStatus": 422,
-      "error": "No supported video resolution was found (720p–8K)."
+      "checkedAt": "2026-11-20T10:53:52.621Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "Dwayne Lawrence | Jiangbo Education | 22 likes · 1 comment | LinkedIn",
+      "qualities": [720]
     },
     {
       "platform": "Twitch",
       "url": "https://clips.twitch.tv/ZanyBlazingOtterNomNom-86PFh3-7kWWyJhrs",
-      "checkedAt": "2026-11-19T10:40:38.212Z",
+      "checkedAt": "2026-11-20T10:54:00.043Z",
       "status": "inspection passed",
       "httpStatus": 200,
       "title": "Liftoff of the Roman Space Telescope",
@@ -65,7 +66,7 @@
     {
       "platform": "Vimeo",
       "url": "https://vimeo.com/1084537",
-      "checkedAt": "2026-11-19T10:40:38.213Z",
+      "checkedAt": "2026-11-20T10:54:00.044Z",
       "status": "inspection failed",
       "httpStatus": 422,
       "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
@@ -73,7 +74,7 @@
     {
       "platform": "Facebook",
       "url": "https://www.facebook.com/NASA/videos/10154861046561772/",
-      "checkedAt": "2026-11-19T10:40:38.214Z",
+      "checkedAt": "2026-11-20T10:54:00.045Z",
       "status": "inspection failed",
       "httpStatus": 422,
       "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
@@ -81,10 +82,11 @@
     {
       "platform": "Dailymotion",
       "url": "https://www.dailymotion.com/video/xbxi4vu",
-      "checkedAt": "2026-11-19T10:40:40.808Z",
-      "status": "inspection failed",
-      "httpStatus": 422,
-      "error": "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable."
+      "checkedAt": "2026-11-20T10:54:08.201Z",
+      "status": "inspection passed",
+      "httpStatus": 200,
+      "title": "MOMENT HISTORIQUE",
+      "qualities": [720, 1080, 1440, 2160]
     }
   ]
 }

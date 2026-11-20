@@ -6,13 +6,17 @@ import { fileURLToPath } from "node:url";
 const samples = JSON.parse(
   await readFile(new URL("../docs/SAMPLE-URLS.json", import.meta.url), "utf8"),
 );
+const apiBase = (process.env.FLUX_API_URL || "http://127.0.0.1:3000").replace(
+  /\/$/,
+  "",
+);
 const results = [];
 for (let i = 0; i < samples.length; i += 3) {
   const batch = await Promise.all(
     samples.slice(i, i + 3).map(async (sample) => {
       const checkedAt = new Date().toISOString();
       try {
-        const response = await fetch("http://127.0.0.1:3000/api/inspect", {
+        const response = await fetch(`${apiBase}/api/inspect`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ url: sample.url }),
