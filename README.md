@@ -1,20 +1,38 @@
-# Flux — video downloader
+<div align="center">
 
-**Made by [zubairhussain.xyz](https://zubairhussain.xyz).**
+# Flux: free video downloader for YouTube, TikTok, Instagram, X and more
 
-AI-readable site information is available at `/llms.txt`; `/llm.txt` redirects there. Optional Google AdSense setup is documented in [advertising configuration](docs/ADSENSE.md). Ads are disabled by default.
+**Save public videos in their original quality, from 720p to 4K and 8K.**
+Web app · one-command CLI · Chrome extension · MCP server for AI agents. No account, no DRM bypass.
 
-Local-first Next.js + TypeScript downloader with a responsive violet/dark homepage, source-quality selection, persistent download records, an MCP server, and a Chrome Manifest V3 extension.
+[![Verify Flux](https://github.com/Zubair-hussain/Flux/actions/workflows/ci.yml/badge.svg?branch=_prod)](https://github.com/Zubair-hussain/Flux/actions/workflows/ci.yml)
+[![Sightline audit](https://github.com/Zubair-hussain/Flux/actions/workflows/sightline.yml/badge.svg?branch=_prod)](https://github.com/Zubair-hussain/Flux/actions/workflows/sightline.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-violet.svg)](LICENSE)
+![Platforms](https://img.shields.io/badge/runs%20on-Windows%20%7C%20macOS%20%7C%20Linux-6e56cf)
+![Quality](https://img.shields.io/badge/quality-720p%20to%208K-9873ff)
+![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178c6)
+
+[Demo](#see-it-work) · [CLI](#one-command-cli) · [Run the web app](#run) · [Legal](#legal-and-responsible-use) · [Contribute](#contributing)
+
+</div>
+
+Flux is an open-source, local-first video downloader by [Zubair Hussain](https://zubairhussain.xyz). Paste a link from YouTube, TikTok, Instagram, X (Twitter), LinkedIn, Twitch, Dailymotion and other sites. Flux shows only the resolutions the original upload really has, then saves the video to your own computer. It is built with Next.js, TypeScript, [yt-dlp](https://github.com/yt-dlp/yt-dlp) and FFmpeg.
+
+⭐ **If Flux saves you time, star the repo.** It helps other people find it.
 
 ## Table of contents
 
 1. [See it work](#see-it-work)
-2. [Run](#run)
-3. [Included](#included)
-4. [Website audit (Sightline)](#website-audit-sightline)
-5. [Checks](#checks)
-6. [Demo video](#demo-video)
-7. [Limits](#limits)
+2. [One-command CLI](#one-command-cli)
+3. [Run the web app](#run)
+4. [Included](#included)
+5. [Website audit (Sightline)](#website-audit-sightline)
+6. [Checks](#checks)
+7. [Demo video](#demo-video)
+8. [Limits](#limits)
+9. [Legal and responsible use](#legal-and-responsible-use)
+10. [Contributing](#contributing)
+11. [License](#license)
 
 ## See it work
 
@@ -37,7 +55,22 @@ Paste a public link, Flux reads the real source resolutions, you pick a quality,
 | Keeping files **private**                                       | Runs on your computer. No account, and files never pass through someone else's server |
 | **Browser and AI workflows**                                    | Chrome extension and an MCP server for Claude, Codex and other agents                 |
 
+## One-command CLI
+
+The `flux` command downloads from every supported platform in one step, on Windows, macOS and Linux. It is a single 14 kB file with no dependencies, and applies the same content policy and quality rules as the web app.
+
+```bash
+npx flux-downloader https://youtu.be/aqz-KE-bpKQ          # best quality the source has
+npx flux-downloader https://youtu.be/aqz-KE-bpKQ -q 1080  # exact: 720, 1080, 1440, 4k, 8k
+npx flux-downloader info https://youtu.be/aqz-KE-bpKQ     # list qualities without downloading
+npx flux-downloader doctor                                # check Node.js, yt-dlp and FFmpeg
+```
+
+Install it once with `npm install -g flux-downloader`, then use `flux <url>`. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Details are in [packages/cli](packages/cli/README.md). Publishing to npm happens when a `cli-v<version>` tag is pushed (see [publish-cli.yml](.github/workflows/publish-cli.yml)); until the first release, use the repository build.
+
 ## Run
+
+Run the web app locally:
 
 Requires Node.js 22+ (also used for YouTube challenges), Python 3.11+ (yt-dlp has deprecated 3.10), and FFmpeg on PATH.
 
@@ -65,6 +98,7 @@ Successful inspections are reused for 60 seconds, including when starting a down
 - Download queue/status and streamed local files; two concurrent download slots, restart detection, no shell interpolation, no client-controlled filesystem paths.
 - [MCP / REST guide](docs/AGENTS.md) for agent clients, including Claude and Codex. Four tools inspect, download, list, and check status. Start the app first, then configure the stdio server (`npm run mcp`).
 - Chrome extension: open `chrome://extensions`, enable Developer mode, click **Load unpacked**, and select the `extension/` folder. Open a supported video tab, click the extension, then **Open in Flux**. No history permission, remote scripts, or automatic page access.
+- Optional Google AdSense with reserved, layout-safe ad positions. Ads are off by default; see [advertising configuration](docs/ADSENSE.md).
 - [Desktop/mobile wireframes](docs/WIREFRAMES.md), [test matrix](docs/TEST-CASES.md), [verification results](docs/VERIFICATION.md), and [delivery plan](docs/PLAN.md).
 
 ## Website audit (Sightline)
@@ -118,3 +152,15 @@ Coverage covers backend and API code, with enforced thresholds; open `coverage/i
 Download only media you own or have permission to save. No DRM bypass, login-cookie import, playlists, current livestream recording, or sexual content. No account is required by Flux; source platforms may still restrict access. High-resolution media needs adequate disk space. Failed partial files require manual cleanup. This is a trusted local MVP, not a public multi-user service or a fully moderated product.
 
 Implementation references: [Next.js App Router](https://nextjs.org/docs/app), [yt-dlp format selection](https://github.com/yt-dlp/yt-dlp#format-selection), [MCP SDK](https://ts.sdk.modelcontextprotocol.io/), [Chrome extension documentation](https://developer.chrome.com/docs/extensions/develop).
+
+## Legal and responsible use
+
+Flux is a tool, and you are responsible for how you use it. Download only videos you own, have permission to save, or that are licensed for it, and follow each platform's terms of service. Flux never bypasses DRM, sign-in or paywalls, and blocks live streams, playlists, age-restricted and sexual content. It is **not affiliated with** YouTube, TikTok, Instagram, X, LinkedIn, Twitch, Dailymotion or any other platform. Read the full [legal notice](LEGAL.md). Copyright concerns: hello@zubairhussain.xyz.
+
+## Contributing
+
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md) and the [code of conduct](CODE_OF_CONDUCT.md), and report security problems privately as described in [SECURITY.md](SECURITY.md). The default branch is `_prod`.
+
+## License
+
+[MIT](LICENSE) © 2026 [Zubair Hussain](https://zubairhussain.xyz). AI-readable project information is at `/llms.txt` on the website.

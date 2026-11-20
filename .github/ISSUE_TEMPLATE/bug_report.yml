@@ -1,0 +1,39 @@
+name: Bug report
+description: Something is not working
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead?
+    validations:
+      required: true
+  - type: input
+    id: platform
+    attributes:
+      label: Video platform
+      placeholder: YouTube, TikTok, Instagram…
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where
+      options:
+        - Web app
+        - flux CLI
+        - Chrome extension
+        - MCP server
+    validations:
+      required: true
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: Output of `flux doctor` (or your Node, Python, yt-dlp and FFmpeg versions) and your operating system.
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Responsible use
+      options:
+        - label: The video is one I own or have permission to download, and it is not DRM-protected, private, or age-restricted.
+          required: true

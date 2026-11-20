@@ -1,0 +1,21 @@
+name: Platform request
+description: Ask for a new video platform
+labels: [platform]
+body:
+  - type: input
+    id: platform
+    attributes:
+      label: Platform name and website
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why it would help
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Requirements
+      options:
+        - label: The platform shows public videos without sign-in and is not an adult-content site.
+          required: true
