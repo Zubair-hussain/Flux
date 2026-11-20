@@ -1,0 +1,54 @@
+name: Deploy to Cloudflare
+# Publishes the public website (Cloudflare Workers) on every push to _prod.
+# Needs repository secrets CLOUDFLARE_API_TOKEN (Workers Scripts: Edit) and
+# CLOUDFLARE_ACCOUNT_ID. Skips cleanly until they are set.
+on:
+  push:
+    branches: [_prod]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: deploy-cloudflare
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      FLUX_PUBLIC_SITE: "true"
+      SITE_URL: ${{ vars.FLUX_PUBLIC_URL || 'https://flux.detroonshah.workers.dev' }}
+      SEO_INDEXABLE: ${{ vars.SEO_INDEXABLE || 'false' }}
+    steps:
+      - name: Check Cloudflare credentials
+        id: creds
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ] || [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::notice::Cloudflare secrets are not set; skipping deploy."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.ready == 'true'
+      - uses: actions/setup-node@v4
+        if: steps.creds.outputs.ready == 'true'
+        with:
+          node-version: 24
+          cache: npm
+      - if: steps.creds.outputs.ready == 'true'
+        run: npm ci
+      - if: steps.creds.outputs.ready == 'true'
+        run: npx vitest run
+      - if: steps.creds.outputs.ready == 'true'
+        run: npx opennextjs-cloudflare build
+      - if: steps.creds.outputs.ready == 'true'
+        run: npx wrangler deploy
+      - name: Smoke test the live site
+        if: steps.creds.outputs.ready == 'true'
+        run: |
+          sleep 10
+          curl -fsS -o /dev/null "$SITE_URL/"
+          curl -fsS -o /dev/null "$SITE_URL/about"

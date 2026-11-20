@@ -51,13 +51,15 @@ const jsonLd = {
 };
 
 export default function Home() {
+  const publicSite = process.env.FLUX_PUBLIC_SITE === "true";
   return (
     <>
       <FluxApp
+        publicSite={publicSite}
         guide={
           <>
             <AdSlot placement="home" />
-            <HomeGuide />
+            <HomeGuide publicSite={publicSite} />
           </>
         }
       />

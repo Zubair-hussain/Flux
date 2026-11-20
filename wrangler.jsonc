@@ -1,0 +1,22 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flux",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-11-19",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "observability": { "enabled": true },
+  "workers_dev": true,
+  "preview_urls": false,
+  // Runtime values for server-rendered routes (ads.txt, robots.txt, sitemap).
+  // Static pages read the same variables at build time: see cf-deploy.yml.
+  "vars": {
+    "FLUX_PUBLIC_SITE": "true",
+    "SITE_URL": "https://flux.detroonshah.workers.dev",
+    // Keep false until a custom domain is attached (avoids indexing workers.dev).
+    "SEO_INDEXABLE": "false",
+  },
+}

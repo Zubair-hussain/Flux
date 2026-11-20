@@ -27,12 +27,13 @@ Flux is an open-source, local-first video downloader by [Zubair Hussain](https:/
 3. [Run the web app](#run)
 4. [Included](#included)
 5. [Website audit (Sightline)](#website-audit-sightline)
-6. [Checks](#checks)
-7. [Demo video](#demo-video)
-8. [Limits](#limits)
-9. [Legal and responsible use](#legal-and-responsible-use)
-10. [Contributing](#contributing)
-11. [License](#license)
+6. [Deploy (Cloudflare)](#deploy-cloudflare)
+7. [Checks](#checks)
+8. [Demo video](#demo-video)
+9. [Limits](#limits)
+10. [Legal and responsible use](#legal-and-responsible-use)
+11. [Contributing](#contributing)
+12. [License](#license)
 
 ## See it work
 
@@ -129,6 +130,10 @@ Latest results from the Sightline CI run on GitHub (20 November 2026):
 | Policy pages | 90      | 98  | 100   | SEO 64–70          |
 
 Fixed from the audit: security headers (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS on HTTPS), `WebSite`/`WebApplication`/`FAQPage` JSON-LD, a server-rendered how-to guide and FAQ on the homepage, 30–60 character page titles, and fuller About/Blog content. The remaining website-health items (HTTPS redirect, Brotli, HTTP/3) come from the host or CDN, for example Cloudflare, so they cannot pass on a local build. The "render-blocking script" note refers to Next.js's `nomodule` legacy polyfill, which modern browsers skip. Policy pages keep a word-count note because they are intentionally short.
+
+## Deploy (Cloudflare)
+
+The public website runs on Cloudflare Workers: https://flux.detroonshah.workers.dev. Downloads cannot run there (no Python or FFmpeg), so the hosted homepage gives a ready-to-run `npx flux-downloader` command that saves the video on the visitor's own computer. `npm run cf:deploy` deploys, and [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) does it on every push to `_prod` once the Cloudflare secrets are added. Setup details and going-public steps are in [docs/SEO-AND-HOSTING.md](docs/SEO-AND-HOSTING.md).
 
 ## Checks
 

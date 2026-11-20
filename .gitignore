@@ -15,3 +15,8 @@ reports/
 packages/cli/dist/
 packages/cli/LICENSE
 packages/cli/LEGAL.md
+
+# Cloudflare build output
+.open-next/
+.wrangler/
+.dev.vars

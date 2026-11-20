@@ -2,6 +2,19 @@
 
 This checkout remains a local Node downloader. Static editorial pages can be served quickly, but Python/FFmpeg background jobs require a continuously running Node host. Cloudflare Workers/D1 do not run the existing downloader unchanged. Do not remove the loopback API guard to make public downloads work; a public download service requires a separate authenticated worker architecture.
 
+## Live deployment (Cloudflare Workers)
+
+The public website is deployed with OpenNext to Cloudflare Workers at https://flux.detroonshah.workers.dev. Because Workers cannot run Python, yt-dlp or FFmpeg, the hosted site runs in **public-site mode** (`FLUX_PUBLIC_SITE=true`): the homepage builds a ready-to-run `npx flux-downloader` command instead of downloading, and the API routes keep refusing non-local requests. Videos are saved on the visitor's own device.
+
+```powershell
+npm run cf:preview     # build and run in Cloudflare's runtime locally
+npm run cf:deploy      # build and deploy with wrangler (needs `wrangler login`)
+```
+
+`wrangler.jsonc` holds the runtime variables. Static pages read `SITE_URL` and `SEO_INDEXABLE` at build time, so change them in both `wrangler.jsonc` and the repository variables `FLUX_PUBLIC_URL` / `SEO_INDEXABLE`. The workflow [deploy-cloudflare.yml](../.github/workflows/deploy-cloudflare.yml) deploys every push to `_prod` once the repository secrets `CLOUDFLARE_API_TOKEN` (Workers Scripts: Edit) and `CLOUDFLARE_ACCOUNT_ID` exist.
+
+**Going public:** attach your domain under Workers → flux → Settings → Domains, turn on "Always Use HTTPS" in the zone, set `SITE_URL` to it and `SEO_INDEXABLE=true`, redeploy, then submit the sitemap to Google Search Console. The site stays `noindex` until then.
+
 ## Placeholders and indexing
 
 Set SITE_URL to the real HTTPS domain, replace operator/contact/jurisdiction placeholders in src/lib/editorial.ts, review the policy text against actual operations, then explicitly set SEO_INDEXABLE=true and rebuild. Preview pages default to noindex and robots disallow; the preview sitemap is empty. Do not submit the preview to search engines. Public API routes must remain private and excluded from indexing/caching.

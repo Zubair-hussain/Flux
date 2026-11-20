@@ -1648,3 +1648,42 @@ footer {
   color: #dccbff;
   overflow-wrap: anywhere;
 }
+/* Hosted website: CLI command builder */
+.cli-result {
+  display: grid;
+  gap: 14px;
+}
+.cli-intro,
+.cli-note {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a19cb3;
+}
+.cli-intro code {
+  color: #dccbff;
+  font-size: 12px;
+}
+.cli-command {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  border: 1px solid #3a3247;
+  border-radius: 9px;
+  background: #121118;
+  padding: 10px 10px 10px 14px;
+}
+.cli-command code {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  color: #e9e1ff;
+  font-family: ui-monospace, "Cascadia Code", Menlo, monospace;
+}
+@media (max-width: 600px) {
+  .cli-command {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

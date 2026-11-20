@@ -43,13 +43,30 @@ const steps: [string, string][] = [
   ],
 ];
 
-export function HomeGuide() {
+const publicSteps: [string, string][] = [
+  steps[0],
+  [
+    "Paste it into Flux",
+    "Drop the link into the box above and choose Get download command. Flux checks that the platform is supported.",
+  ],
+  [
+    "Run the command",
+    "Copy the npx flux-downloader command into a terminal on Windows, macOS or Linux. Pick a quality such as 1080p or 4K, or keep the best available.",
+  ],
+  [
+    "Find the file",
+    "The video is saved straight to the folder you ran the command in. It never passes through this website.",
+  ],
+];
+
+export function HomeGuide({ publicSite = false }: { publicSite?: boolean }) {
+  const list = publicSite ? publicSteps : steps;
   return (
     <section className="home-guide" aria-labelledby="how-it-works">
       <div className="guide-block">
         <h2 id="how-it-works">How to download a video in four steps</h2>
         <ol className="guide-steps">
-          {steps.map(([title, text], i) => (
+          {list.map(([title, text], i) => (
             <li key={title}>
               <span className="step-number">{i + 1}</span>
               <div>

@@ -84,7 +84,14 @@ function PlatformIcon({ id, short }: { id: string; short: string }) {
     );
   return <span aria-hidden="true">{short}</span>;
 }
-export function FluxApp({ guide }: { guide?: React.ReactNode }) {
+export function FluxApp({
+  guide,
+  publicSite = false,
+}: {
+  guide?: React.ReactNode;
+  /** Hosted website: downloads run on the visitor's computer via the CLI. */
+  publicSite?: boolean;
+}) {
   const [url, setUrl] = useState("");
   const [video, setVideo] = useState<VideoInfo | null>(null);
   const [quality, setQuality] = useState<Quality>(1080);
@@ -96,6 +103,8 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
     "extension" | "agents" | "platforms" | null
   >(null);
   const [notice, setNotice] = useState("");
+  const [command, setCommand] = useState("");
+  const [cliQuality, setCliQuality] = useState("best");
   const inputRef = useRef<HTMLInputElement>(null);
   const hasActiveJobs = jobs.some(
     (job) => job.status === "queued" || job.status === "downloading",
@@ -105,6 +114,7 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
     if (shared) setUrl(shared);
   }, []);
   useEffect(() => {
+    if (publicSite) return;
     let mounted = true;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let refreshing = false;
@@ -143,7 +153,7 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
       controller.abort();
       document.removeEventListener("visibilitychange", visibilityChanged);
     };
-  }, [hasActiveJobs]);
+  }, [hasActiveJobs, publicSite]);
   useEffect(() => {
     if (!modal) return;
     const close = (e: KeyboardEvent) => {
@@ -152,8 +162,41 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, [modal]);
+  function buildCommand() {
+    setError("");
+    setCommand("");
+    let link: URL;
+    try {
+      link = new URL(url.trim());
+    } catch {
+      setError("Enter a complete https:// video URL.");
+      return;
+    }
+    const known = platforms.some((p) =>
+      p.hosts.some(
+        (h) => link.hostname === h || link.hostname.endsWith(`.${h}`),
+      ),
+    );
+    if (link.protocol !== "https:" || !known) {
+      setError(
+        "This platform is not supported. Choose a platform shown below.",
+      );
+      return;
+    }
+    link.hash = "";
+    setCommand(`npx flux-downloader "${link.href.replace(/"/g, "")}"`);
+  }
+  async function copyCommand(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setNotice("Command copied. Paste it into a terminal to download.");
+    } catch {
+      setNotice("Select the command and copy it manually.");
+    }
+  }
   async function inspect(event: React.FormEvent) {
     event.preventDefault();
+    if (publicSite) return buildCommand();
     setBusy(true);
     setError("");
     setVideo(null);
@@ -213,13 +256,24 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
             <MonitorDown size={19} /> Video downloader{" "}
             <span className="nav-spark">✦</span>
           </button>
-          <button
-            className={tab === "queue" ? "nav-item active" : "nav-item"}
-            onClick={() => setTab("queue")}
-          >
-            <Download size={18} /> My downloads{" "}
-            <span className="count">{jobs.length}</span>
-          </button>
+          {publicSite ? (
+            <a
+              className="nav-item"
+              href="https://github.com/Zubair-hussain/Flux"
+              target="_blank"
+              rel="noopener"
+            >
+              <Code2 size={18} /> Source on GitHub
+            </a>
+          ) : (
+            <button
+              className={tab === "queue" ? "nav-item active" : "nav-item"}
+              onClick={() => setTab("queue")}
+            >
+              <Download size={18} /> My downloads{" "}
+              <span className="count">{jobs.length}</span>
+            </button>
+          )}
           <button className="nav-item" onClick={() => setModal("platforms")}>
             <Globe2 size={19} /> Supported platforms
           </button>
@@ -361,7 +415,11 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
                       ) : (
                         <Download size={17} />
                       )}{" "}
-                      {busy ? "Working…" : "Find video"}
+                      {busy
+                        ? "Working…"
+                        : publicSite
+                          ? "Get download command"
+                          : "Find video"}
                     </button>
                   </div>
                 </form>
@@ -369,6 +427,53 @@ export function FluxApp({ guide }: { guide?: React.ReactNode }) {
                   <p className="error" role="alert">
                     {error}
                   </p>
+                )}
+                {publicSite && command && (
+                  <div className="video-result cli-result">
+                    <p className="cli-intro">
+                      Run this on your computer (Windows, macOS or Linux) to
+                      save the video. It needs Node.js 22+, yt-dlp and FFmpeg;{" "}
+                      <code>npx flux-downloader doctor</code> checks them.
+                    </p>
+                    <div className="result-actions">
+                      <label>
+                        Quality
+                        <select
+                          value={cliQuality}
+                          onChange={(e) => setCliQuality(e.target.value)}
+                        >
+                          <option value="best">Best available</option>
+                          <option value="720">720p</option>
+                          <option value="1080">1080p</option>
+                          <option value="1440">1440p</option>
+                          <option value="4k">4K</option>
+                          <option value="8k">8K</option>
+                        </select>
+                      </label>
+                    </div>
+                    <div className="cli-command">
+                      <code>
+                        {command}
+                        {cliQuality === "best" ? "" : ` -q ${cliQuality}`}
+                      </code>
+                      <button
+                        type="button"
+                        className="primary-button"
+                        onClick={() =>
+                          copyCommand(
+                            `${command}${cliQuality === "best" ? "" : ` -q ${cliQuality}`}`,
+                          )
+                        }
+                      >
+                        <Clipboard size={16} /> Copy
+                      </button>
+                    </div>
+                    <p className="cli-note">
+                      Videos are saved straight to your device; nothing passes
+                      through this website. Only download videos you own or have
+                      permission to save.
+                    </p>
+                  </div>
                 )}
                 {video && (
                   <div className="video-result">
