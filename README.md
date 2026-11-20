@@ -58,16 +58,16 @@ Paste a public link, Flux reads the real source resolutions, you pick a quality,
 
 ## One-command CLI
 
-The `flux` command downloads from every supported platform in one step, on Windows, macOS and Linux. It is a single 14 kB file with no dependencies, and applies the same content policy and quality rules as the web app.
+Download [flux.mjs](https://flux.detroonshah.workers.dev/downloads/flux.mjs) to a folder and open PowerShell (Windows) or Terminal (macOS/Linux) there. The bundled CLI has no npm runtime dependencies; Node.js 22+, yt-dlp, and FFmpeg must be installed. Source availability varies by platform.
 
 ```bash
-npx flux-downloader https://youtu.be/aqz-KE-bpKQ          # best quality the source has
-npx flux-downloader https://youtu.be/aqz-KE-bpKQ -q 1080  # exact: 720, 1080, 1440, 4k, 8k
-npx flux-downloader info https://youtu.be/aqz-KE-bpKQ     # list qualities without downloading
-npx flux-downloader doctor                                # check Node.js, yt-dlp and FFmpeg
+node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ'          # best available quality
+node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ' -q 1080  # selected source quality
+node ./flux.mjs info 'https://youtu.be/aqz-KE-bpKQ'     # inspect without downloading
+node ./flux.mjs doctor                                # check prerequisites
 ```
 
-Install it once with `npm install -g flux-downloader`, then use `flux <url>`. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Details are in [packages/cli](packages/cli/README.md). Publishing to npm happens when a `cli-v<version>` tag is pushed (see [publish-cli.yml](.github/workflows/publish-cli.yml)); until the first release, use the repository build.
+The public website uses this direct download instead of depending on an npm release. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Builds also copy the CLI and license files into the website's public downloads folder. An npm release workflow exists, but npm installation should only be advertised after publication is verified.
 
 ## Run
 
@@ -133,7 +133,7 @@ Fixed from the audit: security headers (CSP, `nosniff`, `X-Frame-Options`, `Refe
 
 ## Deploy (Cloudflare)
 
-The public website runs on Cloudflare Workers: https://flux.detroonshah.workers.dev. Downloads cannot run there (no Python or FFmpeg), so the hosted homepage gives a ready-to-run `npx flux-downloader` command that saves the video on the visitor's own computer. `npm run cf:deploy` deploys, and [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) does it on every push to `_prod` once the Cloudflare secrets are added. Setup details and going-public steps are in [docs/SEO-AND-HOSTING.md](docs/SEO-AND-HOSTING.md).
+The public website runs on Cloudflare Workers: https://flux.detroonshah.workers.dev. Media processing runs on the visitor's computer, so the hosted homepage provides a downloadable CLI and a `node ./flux.mjs` command. `npm run cf:deploy` deploys, and [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) does it on every push to `_prod` once the Cloudflare secrets are added. Setup details and going-public steps are in [docs/SEO-AND-HOSTING.md](docs/SEO-AND-HOSTING.md).
 
 ## Checks
 

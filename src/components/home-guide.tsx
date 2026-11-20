@@ -51,7 +51,7 @@ const publicSteps: [string, string][] = [
   ],
   [
     "Run the command",
-    "Copy the npx flux-downloader command into a terminal on Windows, macOS or Linux. Pick a quality such as 1080p or 4K, or keep the best available.",
+    "Download flux.mjs using the link beside your generated command. Open PowerShell on Windows or Terminal on macOS/Linux in the download folder, then run the node ./flux.mjs command. Node.js 22+, yt-dlp and FFmpeg are required. Pick a source quality or keep best available.",
   ],
   [
     "Find the file",

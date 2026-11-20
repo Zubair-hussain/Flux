@@ -1649,6 +1649,12 @@ footer {
   overflow-wrap: anywhere;
 }
 /* Hosted website: CLI command builder */
+@media (max-width: 600px) {
+  .hero::before {
+    left: 0;
+    right: 0;
+  }
+}
 .cli-result {
   display: grid;
   gap: 14px;

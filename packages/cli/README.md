@@ -3,10 +3,12 @@
 **One command to save public videos in their original quality**, from YouTube, TikTok, Instagram, X, LinkedIn, Twitch, Dailymotion and more. It works on Windows, macOS and Linux, needs no account, and never bypasses DRM.
 
 ```bash
-npx flux-downloader https://youtu.be/aqz-KE-bpKQ
+node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ'
 ```
 
-Or install it once and use `flux` anywhere:
+First download [flux.mjs](https://flux.detroonshah.workers.dev/downloads/flux.mjs) and open PowerShell or Terminal in that folder. This works without an npm release. Run `node ./flux.mjs doctor` to check prerequisites.
+
+The following npm installation is only available after a verified npm publication:
 
 ```bash
 npm install -g flux-downloader

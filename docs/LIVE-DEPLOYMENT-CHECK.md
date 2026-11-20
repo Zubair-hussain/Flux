@@ -4,7 +4,17 @@ Target: https://flux.detroonshah.workers.dev/
 
 The homepage, blog, About, Privacy, Cookies, Terms, Copyright, Content Policy, social preview image, robots, sitemap, llms.txt, and ads.txt returned HTTP 200. Canonical links use the live host. Cloudflare/OpenNext cache HIT headers were present on the homepage and static editorial pages. Observed individual page requests took roughly 130–730 ms from this machine; these are not general performance guarantees.
 
-## Blocking issues
+## Resolution — direct CLI distribution
+
+The public command generator now provides `/downloads/flux.mjs` and generates `node ./flux.mjs '<video URL>'` for PowerShell or macOS/Linux Terminal. It no longer depends on the unpublished npm package. Builds copy the standalone bundle and its license files into public assets, and deployment smoke checks execute the downloaded bundle. Local API endpoints intentionally remain private: this is a public CLI companion website, not a hosted browser video-processing service.
+
+The deployed CLI SHA-256 matched the tested local bundle (`912440541493b642d622aa0a1e64bc3f26ce1b6a42f3544010711c5a65749e8d`). Version and prerequisite checks passed. That downloaded file successfully inspected the Blender YouTube sample through 4K and completed a real NASA TikTok download at 720p. FFprobe verified AAC audio and HEVC video at 720×1280, duration 25.17 seconds, size 1,761,577 bytes. These checks establish those particular sources worked; other platforms can still impose authentication or regional restrictions.
+
+Final Cloudflare deployment version: `3b69d8e7-bc1c-4eb6-ba84-2799620da9aa`. Live desktop/mobile browser checks passed for command generation, quality selection, and the direct CLI link. The mobile hero background overflow was corrected; viewport width and document width both measured 390px. Cloudflare build and 88 unit/API tests passed. Proof screenshots are in `reports/live/fixed-command-desktop.png` and `reports/live/fixed-command-mobile.png`.
+
+Search indexing and AdSense remain disabled pending launch configuration. They are independent of the resolved CLI distribution issue.
+
+## Initial blocking issues
 
 - Browser verification confirmed the live form uses **Get download command**, not Find video. It successfully generated `npx flux-downloader "https://www.youtube.com/watch?v=aqz-KE-bpKQ"`. However, `npm view flux-downloader version` returned registry E404 during this check. Visitors cannot run the advertised command from npm until the CLI is published or the site supplies a working installation/download route. No npm publication was performed.
 

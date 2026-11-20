@@ -184,7 +184,7 @@ export function FluxApp({
       return;
     }
     link.hash = "";
-    setCommand(`npx flux-downloader "${link.href.replace(/"/g, "")}"`);
+    setCommand(`node ./flux.mjs '${link.href.replace(/'/g, "%27")}'`);
   }
   async function copyCommand(text: string) {
     try {
@@ -431,9 +431,14 @@ export function FluxApp({
                 {publicSite && command && (
                   <div className="video-result cli-result">
                     <p className="cli-intro">
-                      Run this on your computer (Windows, macOS or Linux) to
-                      save the video. It needs Node.js 22+, yt-dlp and FFmpeg;{" "}
-                      <code>npx flux-downloader doctor</code> checks them.
+                      First{" "}
+                      <a href="/downloads/flux.mjs" download="flux.mjs">
+                        download the Flux CLI
+                      </a>{" "}
+                      and open PowerShell (Windows) or Terminal (macOS/Linux) in
+                      that folder. It needs Node.js 22+, yt-dlp and FFmpeg;{" "}
+                      <code>node ./flux.mjs doctor</code> checks them. Then run
+                      this command to save the video locally.
                     </p>
                     <div className="result-actions">
                       <label>

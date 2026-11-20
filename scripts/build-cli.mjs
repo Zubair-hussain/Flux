@@ -1,6 +1,6 @@
 // Bundles the `flux` CLI into one dependency-free file: packages/cli/dist/flux.mjs
 import { build } from "esbuild";
-import { copyFile, readFile } from "node:fs/promises";
+import { copyFile, readFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
 const root = path.resolve(import.meta.dirname, "..");
@@ -23,4 +23,12 @@ await build({
 });
 for (const file of ["LICENSE", "LEGAL.md"])
   await copyFile(path.join(root, file), path.join(pkgDir, file));
+const publicDir = path.join(root, "public/downloads");
+await mkdir(publicDir, { recursive: true });
+await copyFile(
+  path.join(pkgDir, "dist/flux.mjs"),
+  path.join(publicDir, "flux.mjs"),
+);
+for (const file of ["LICENSE", "LEGAL.md"])
+  await copyFile(path.join(root, file), path.join(publicDir, file));
 console.log(`Built flux-downloader ${version} → packages/cli/dist/flux.mjs`);

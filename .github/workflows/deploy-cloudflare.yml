@@ -43,7 +43,7 @@ jobs:
       - if: steps.creds.outputs.ready == 'true'
         run: npx vitest run
       - if: steps.creds.outputs.ready == 'true'
-        run: npx opennextjs-cloudflare build
+        run: npm run cf:build
       - if: steps.creds.outputs.ready == 'true'
         run: npx wrangler deploy
       - name: Smoke test the live site
@@ -52,3 +52,5 @@ jobs:
           sleep 10
           curl -fsS -o /dev/null "$SITE_URL/"
           curl -fsS -o /dev/null "$SITE_URL/about"
+          curl -fsS "$SITE_URL/downloads/flux.mjs" -o /tmp/flux.mjs
+          node /tmp/flux.mjs --version

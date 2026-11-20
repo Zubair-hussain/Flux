@@ -62,6 +62,7 @@ for (const path of [
   "/ads.txt",
   "/social/home.png",
   "/api/downloads",
+  "/downloads/flux.mjs",
 ])
   await check(path);
 const samples = JSON.parse(

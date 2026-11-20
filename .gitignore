@@ -13,6 +13,7 @@ playwright-report/
 .sightline/
 reports/
 packages/cli/dist/
+/public/downloads/
 packages/cli/LICENSE
 packages/cli/LEGAL.md
 
