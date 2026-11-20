@@ -67,7 +67,18 @@ node ./flux.mjs info 'https://youtu.be/aqz-KE-bpKQ'     # inspect without downlo
 node ./flux.mjs doctor                                # check prerequisites
 ```
 
-The public website uses this direct download instead of depending on an npm release. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Builds also copy the CLI and license files into the website's public downloads folder. An npm release workflow exists, but npm installation should only be advertised after publication is verified.
+The public website uses this direct download instead of depending on an npm release. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Builds also copy the CLI and license files into the website's public downloads folder. Bare package-name installation requires a verified npm registry release; the direct archive below does not.
+
+You can also use the installable [npm tarball](https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz) without a registry publication:
+
+```powershell
+npx --yes --package=https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz flux doctor
+# Or download the .tgz file and install it globally:
+npm install -g ./flux-downloader-1.0.0.tgz
+flux --version
+```
+
+`npm run verify:package` checks a generated archive in an empty temporary directory, including installation, the npm executable shim, version, platform listing, licenses, and unsupported-URL rejection. Supply a live archive URL after `--` to verify the deployed package. CI runs this installation check on Windows, Linux, and macOS; the local check does not itself establish results on the other operating systems.
 
 ## Run
 

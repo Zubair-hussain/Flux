@@ -37,6 +37,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build:cli
+      - run: npm run verify:package
       - run: node packages/cli/dist/flux.mjs --version
       - run: node packages/cli/dist/flux.mjs platforms
       - name: Rejects unsupported sites

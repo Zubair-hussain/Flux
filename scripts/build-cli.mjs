@@ -2,6 +2,8 @@
 import { build } from "esbuild";
 import { copyFile, readFile, mkdir } from "node:fs/promises";
 import path from "node:path";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
 
 const root = path.resolve(import.meta.dirname, "..");
 const pkgDir = path.join(root, "packages/cli");
@@ -31,4 +33,23 @@ await copyFile(
 );
 for (const file of ["LICENSE", "LEGAL.md"])
   await copyFile(path.join(root, file), path.join(publicDir, file));
+const npmCli = process.env.npm_execpath;
+if (!npmCli) throw new Error("Run this script through npm run build:cli.");
+const { stdout } = await promisify(execFile)(
+  process.execPath,
+  [
+    npmCli,
+    "pack",
+    pkgDir,
+    "--ignore-scripts",
+    "--pack-destination",
+    publicDir,
+    "--json",
+  ],
+  { cwd: root, windowsHide: true },
+);
+const [packed] = JSON.parse(stdout);
+console.log(
+  `Packaged ${packed.filename} (${packed.size} bytes) for direct npm installation.`,
+);
 console.log(`Built flux-downloader ${version} → packages/cli/dist/flux.mjs`);

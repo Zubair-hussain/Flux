@@ -14,7 +14,15 @@ Final Cloudflare deployment version: `3b69d8e7-bc1c-4eb6-ba84-2799620da9aa`. Liv
 
 Search indexing and AdSense remain disabled pending launch configuration. They are independent of the resolved CLI distribution issue.
 
-## Initial blocking issues
+## Installable npm package verification
+
+On 21 November 2026, the public `.tgz` distribution was added at `https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz` (deployment `b03caf8f-4e28-400f-ad71-11adf27f85bb`). A fresh temporary npm project installed that live URL with lifecycle scripts disabled. The packaged version, executable shim (`npm exec --offline -- flux --version`), platform list, license files, unsupported-URL rejection, and helpful missing-engine/FFmpeg errors all passed. The exact advertised `npx --yes --package=<live archive URL> flux doctor` command passed independently.
+
+That isolated installed package then inspected the real Blender YouTube sample through 4K and downloaded the NASA TikTok sample at 720p with audio. The public desktop/mobile command-generator checks passed again. All 88 unit/API tests and the Cloudflare production build passed. These installation checks ran on Windows with Node.js 24; the CI matrix is configured to repeat package checks on Linux and macOS, but those remote runs were not executed during this local session.
+
+Repeat a clean installation check with `npm run verify:package -- https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz`. A machine-readable result is saved to `reports/package/latest.json`. The bare registry name is still unpublished: use the explicit archive URL or standalone `.mjs` download until npm publishing credentials and a registry release are available.
+
+## Initial blocking issues (historical)
 
 - Browser verification confirmed the live form uses **Get download command**, not Find video. It successfully generated `npx flux-downloader "https://www.youtube.com/watch?v=aqz-KE-bpKQ"`. However, `npm view flux-downloader version` returned registry E404 during this check. Visitors cannot run the advertised command from npm until the CLI is published or the site supplies a working installation/download route. No npm publication was performed.
 

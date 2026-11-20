@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { platforms, qualityLabel, type Quality } from "@/lib/platforms";
 import type { Job, VideoInfo } from "@/lib/types";
+import { version as cliVersion } from "../../packages/cli/package.json";
 
 async function api<T>(
   url: string,
@@ -439,6 +440,20 @@ export function FluxApp({
                       that folder. It needs Node.js 22+, yt-dlp and FFmpeg;{" "}
                       <code>node ./flux.mjs doctor</code> checks them. Then run
                       this command to save the video locally.
+                    </p>
+                    <p className="cli-note">
+                      For npm users:{" "}
+                      <a
+                        href={`/downloads/flux-downloader-${cliVersion}.tgz`}
+                        download
+                      >
+                        download the npm package (.tgz)
+                      </a>
+                      . Install that file with{" "}
+                      <code>
+                        npm install -g ./flux-downloader-{cliVersion}.tgz
+                      </code>{" "}
+                      to use the <code>flux</code> command.
                     </p>
                     <div className="result-actions">
                       <label>

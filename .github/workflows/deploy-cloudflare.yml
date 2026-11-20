@@ -54,3 +54,5 @@ jobs:
           curl -fsS -o /dev/null "$SITE_URL/about"
           curl -fsS "$SITE_URL/downloads/flux.mjs" -o /tmp/flux.mjs
           node /tmp/flux.mjs --version
+          version=$(node -p "require('./packages/cli/package.json').version")
+          npm run verify:package -- "$SITE_URL/downloads/flux-downloader-$version.tgz"
