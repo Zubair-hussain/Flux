@@ -22,6 +22,8 @@ Successful inspections are reused for 60 seconds, including when starting a down
 
 ## Included
 
+- [Blog](/blog), About, Privacy, Cookies, Terms, Copyright, and Content Policy pages with breadcrumbs, canonical metadata, social cards, and preview-safe indexing. Blogger connection, public-domain configuration, and Cloudflare/D1 preparation are documented in [SEO and hosting](docs/SEO-AND-HOSTING.md). Placeholders are intentional; cloud services are not provisioned.
+
 - YouTube, TikTok, Reddit, LinkedIn, Instagram, Twitch, X, Vimeo, Facebook, and Dailymotion domain support through yt-dlp. Source access and extractor support vary.
 - Exact source resolutions: 720p, 1080p, 1440p, 4K, 8K; never upscale. Video/audio merging uses FFmpeg, typically producing MKV for codec compatibility.
 - URL and metadata filtering for sexual/NSFW and age-restricted content. **Metadata filtering cannot guarantee visual content safety**; see [content policy](docs/CONTENT-POLICY.md).

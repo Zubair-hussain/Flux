@@ -4,8 +4,8 @@ Verified locally on Windows with Node 24, Next.js 16, Python 3.10, yt-dlp 2026.1
 
 - Production build: passed, including all five API route handlers.
 - TypeScript: passed.
-- Unit/API tests: 67 passed, including portrait resolution, cache expiry/coalescing, retry after failure, cached preflight, and job-list invalidation.
-- Backend/API V8 coverage: statements 99.01%, branches 94.11%, functions 97.56%, lines 98.97%. UI, MCP, extension, configuration, and docs are outside these percentages.
+- Unit/API tests: 71 passed, including Blogger failures and safe links, preview metadata, portrait resolution, cache expiry/coalescing, cached preflight, and job-list invalidation.
+- Backend/library/API V8 coverage: statements 99.13%, branches 92.46%, functions 97.72%, lines 99.09%. UI, MCP, extension, configuration, and docs are outside these percentages.
 - Browser suite: 12 passed across desktop (1440px) and mobile (390px), tested against the production server. Includes source-quality selection, creating a job, policy error display, dialog dismissal, layout overflow, idle/hidden-tab polling, and mocked Chrome popup behavior. The two responsive homepage checks additionally passed with assertions that no Google font requests occur.
 - MCP: real stdio handshake, discovery of all four tool schemas, and list-downloads API round-trip passed (`node scripts/smoke-mcp.mjs` with the app running).
 - Dependency audit: zero vulnerabilities after upgrading Vitest/coverage and Zod.
@@ -15,6 +15,8 @@ Verified locally on Windows with Node 24, Next.js 16, Python 3.10, yt-dlp 2026.1
 Screenshots: `test-results/home-desktop.png` and `test-results/home-mobile.png`. HTML coverage: `coverage/index.html`. These generated artifacts are ignored by Git; CI uploads verification artifacts.
 
 Chrome's actual load-unpacked installation and every supported platform/source combination are not automated here. Third-party access varies; inspect/download failures are exposed in the UI. Public hosting and visual content moderation are outside this local MVP's scope.
+
+Publishing update verified 20 November 2026: all 14 desktop/mobile browser tests passed against the production server. The additional tests visit all seven editorial/blog routes and verify unique titles, canonical links, noindex metadata, breadcrumb JSON-LD, social-image availability, responsive overflow, Blogger coming-soon state, robots, and the preview sitemap. Production build, TypeScript, and formatting checks passed. Blogger credentials and Cloudflare account access were not supplied; those external integrations are not live-verified. Cloudflare deliverables are a cache configuration plan and optional D1 catalog migration, not a deployed database or cache.
 
 Live sample checks for all ten configured platforms are recorded in [SAMPLE-URLS.md](SAMPLE-URLS.md) and `LIVE-SAMPLE-RESULTS.json`. Five passed inspection on the recorded run; the remaining five exposed source restrictions, missing dimensions, or extractor/dependency limitations. The portrait-quality fix was also checked with real yt-dlp format selection for both a 720×1280 TikTok source and a 1280×720 YouTube source.
 
