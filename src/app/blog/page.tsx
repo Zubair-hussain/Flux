@@ -52,6 +52,38 @@ export default async function Blog() {
         </p>
       </section>
       <section>
+        <h2>1080p or 4K: which should you pick?</h2>
+        <p>
+          A 4K file is often three to four times the size of the same video in
+          1080p. Pick 4K when you will watch on a large screen or edit and crop
+          the footage. For phones, laptops, and quick sharing, 1080p usually
+          looks the same and downloads much faster. Portrait clips from TikTok
+          or Instagram rarely go above 1080p.
+        </p>
+      </section>
+      <section>
+        <h2>Why the file is MKV</h2>
+        <p>
+          High-resolution sources usually deliver video and audio as separate
+          streams in different codecs. Flux merges them with FFmpeg into MKV
+          because that container accepts nearly every codec without re-encoding,
+          so you keep the original quality. VLC, mpv, and most modern players
+          open MKV directly.
+        </p>
+      </section>
+      <section>
+        <h2>Keep the engine up to date</h2>
+        <p>
+          Video sites change often. If a link that used to work starts failing,
+          update the engine with{" "}
+          <code>
+            python -m pip install -U &quot;yt-dlp[default,curl-cffi]&quot;
+          </code>{" "}
+          and try again. The curl-cffi extra lets yt-dlp reach sites such as
+          Dailymotion that check which browser is asking.
+        </p>
+      </section>
+      <section>
         <h2>Respect the creator</h2>
         <p>
           Check permission before saving or republishing. A download tool does

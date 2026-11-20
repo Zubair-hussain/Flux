@@ -9,7 +9,7 @@ export function pageMetadata(
   description: string,
   path: string,
 ): Metadata {
-  const socialTitle = `${title} | Flux`;
+  const socialTitle = /\bFlux\b/.test(title) ? title : `${title} | Flux`;
   return {
     title: socialTitle,
     description,

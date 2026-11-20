@@ -4,6 +4,7 @@ import "./globals.css";
 import Link from "next/link";
 import { pageMetadata, siteUrl } from "@/lib/site";
 import { pages } from "@/lib/editorial";
+import { AdSense } from "@/components/adsense";
 const dmSans = localFont({
   src: "../../node_modules/@fontsource-variable/dm-sans/files/dm-sans-latin-wght-normal.woff2",
   variable: "--font-dm-sans",
@@ -32,7 +33,11 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${dmSans.variable} ${manrope.variable}`}>
+      <head>
+        <link rel="describedby" href="/llms.txt" type="text/plain" />
+      </head>
       <body>
+        <AdSense />
         {children}
         <nav className="public-links" aria-label="Resources and policies">
           <Link href="/blog">Blog</Link>

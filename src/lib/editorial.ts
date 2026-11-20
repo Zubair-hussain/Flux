@@ -1,6 +1,7 @@
 export const pages = {
   about: {
     title: "About Flux",
+    seoTitle: "About Flux, the local-first video downloader",
     description:
       "How Flux handles local video downloads, supported platforms, and source quality.",
     sections: [
@@ -17,6 +18,18 @@ export const pages = {
         "Local verification covers URL validation, download jobs, portrait formats, and browser interactions. A Blender YouTube sample completed a download with audio. Results for other platforms vary with login requirements and extractor changes.",
       ],
       [
+        "Supported platforms",
+        "Flux recognises links from YouTube, TikTok, Instagram, Reddit, X, LinkedIn, Twitch, Vimeo, Facebook, and Dailymotion. Each platform decides what is reachable without an account, and the same platform can allow one video and block another. Some, such as Reddit and Vimeo, increasingly require sign-in, and Flux deliberately does not import login cookies. When a platform changes its site, updating yt-dlp usually restores support.",
+      ],
+      [
+        "How a download works",
+        "Flux first asks yt-dlp for the video’s metadata without downloading media. It checks the title, flags, and age rating against the content policy, then lists the real source resolutions. When you start a download, the best video and audio streams at that resolution are fetched and merged by FFmpeg into one file in your local downloads folder.",
+      ],
+      [
+        "Tools for browsers and AI agents",
+        "A Chrome extension sends the current tab to Flux without needing history or page access permissions. An MCP server lets assistants such as Claude inspect a link, start a download, and check its status through the same local API and safety rules as the website.",
+      ],
+      [
         "Who operates this site",
         "Operator name and contact details are pending configuration. This site is a preview until those details and its public domain are supplied.",
       ],
@@ -24,6 +37,7 @@ export const pages = {
   },
   privacy: {
     title: "Privacy policy",
+    seoTitle: "Privacy policy: how Flux handles your data",
     description:
       "What the Flux local downloader stores and how external video platforms receive requests.",
     sections: [
@@ -37,7 +51,7 @@ export const pages = {
       ],
       [
         "Tracking and retention",
-        "This version includes no advertising or analytics tracker. Fonts are served locally. Hosting providers may keep operational access logs; the operator must document the actual provider and retention before public launch.",
+        "Advertising is disabled by default. Deployments may enable Google AdSense after configuring consent management; Google can then receive device, network, cookie, and advertising information under its policies and the applicable consent choices. No analytics integration is included. Fonts are served locally. The operator must publish actual provider and retention details before public launch.",
       ],
       [
         "Contact and requests",
@@ -47,12 +61,13 @@ export const pages = {
   },
   cookies: {
     title: "Cookie policy",
+    seoTitle: "Cookie policy: browser storage and ads on Flux",
     description:
-      "Cookie and browser-storage behavior in the current Flux application.",
+      "Which cookies and browser storage Flux uses, and how optional Google AdSense changes that.",
     sections: [
       [
         "Current cookies",
-        "Flux application code does not set advertising, analytics, or account cookies. Interface state is held in browser memory. No optional tracking is enabled in this version.",
+        "The default configuration does not load advertising or analytics scripts. Interface state is held in browser memory. If the operator enables Google AdSense, Google and its partners may use cookies or local storage for advertising, measurement, and fraud prevention subject to applicable consent requirements. The configured consent provider must offer the appropriate controls.",
       ],
       [
         "Third-party destinations",
@@ -70,6 +85,7 @@ export const pages = {
   },
   terms: {
     title: "Terms of use",
+    seoTitle: "Terms of use for the Flux video downloader",
     description:
       "Permitted use, source restrictions, and limitations of the Flux downloader.",
     sections: [
@@ -93,6 +109,7 @@ export const pages = {
   },
   copyright: {
     title: "Copyright and removal requests",
+    seoTitle: "Copyright and removal requests | Flux",
     description:
       "How to raise a copyright concern about content published on the Flux website.",
     sections: [
@@ -116,6 +133,7 @@ export const pages = {
   },
   "content-policy": {
     title: "Content and editorial policy",
+    seoTitle: "Content and editorial policy | Flux",
     description:
       "Flux content restrictions, metadata filtering limits, and editorial standards.",
     sections: [

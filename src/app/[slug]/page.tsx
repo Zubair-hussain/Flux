@@ -13,7 +13,7 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const page = pages[slug as keyof typeof pages];
-  return page ? pageMetadata(page.title, page.description, `/${slug}`) : {};
+  return page ? pageMetadata(page.seoTitle, page.description, `/${slug}`) : {};
 }
 export default async function Page({
   params,

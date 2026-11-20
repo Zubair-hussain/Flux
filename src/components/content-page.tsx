@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteUrl } from "@/lib/site";
+import { AdSlot } from "@/components/adsense";
 export function ContentPage({
   title,
   description,
@@ -37,6 +38,7 @@ export function ContentPage({
       <h1>{title}</h1>
       <p className="editorial-lead">{description}</p>
       {children}
+      <AdSlot placement="content" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{

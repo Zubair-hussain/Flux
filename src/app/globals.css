@@ -1470,3 +1470,181 @@ footer {
     font-size: 0;
   }
 }
+/* Homepage guide and FAQ (server-rendered, crawlable) */
+.home-guide {
+  max-width: 890px;
+  margin: 44px auto 0;
+  display: grid;
+  gap: 34px;
+}
+.home-guide h2 {
+  font-size: 18px;
+  font-weight: 650;
+  color: #ebe6f5;
+  margin: 0 0 16px;
+}
+.guide-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.guide-steps li {
+  display: flex;
+  gap: 12px;
+  border: 1px solid #282933;
+  border-radius: 9px;
+  padding: 16px 14px;
+  background: linear-gradient(110deg, #191920, #16171d);
+}
+.step-number {
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #120d1d;
+  background: linear-gradient(135deg, #c7b3ff, #9873ff);
+}
+.guide-steps h3 {
+  font-size: 14px;
+  margin: 2px 0 6px;
+  color: #dad5e5;
+  font-weight: 600;
+}
+.guide-steps p,
+.faq-list p,
+.guide-more {
+  font-size: 13px;
+  line-height: 1.7;
+  color: #9b97aa;
+  margin: 0;
+}
+.faq-list {
+  display: grid;
+  gap: 8px;
+}
+.faq-list details {
+  border: 1px solid #282933;
+  border-radius: 9px;
+  background: #16171d;
+  padding: 0 16px;
+}
+.faq-list details[open] {
+  border-color: #3a3247;
+  background: linear-gradient(100deg, #1d1928, #17161f);
+}
+.faq-list summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 14px 0;
+  font-size: 14px;
+  font-weight: 550;
+  color: #e2dcef;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.faq-list summary::-webkit-details-marker {
+  display: none;
+}
+.faq-list summary::after {
+  content: "+";
+  color: #ad91ff;
+  font-size: 18px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.faq-list details[open] summary::after {
+  transform: rotate(45deg);
+}
+.faq-list details p {
+  padding: 0 0 16px;
+}
+.faq-list summary:focus-visible {
+  outline: 2px solid #ad91ff;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.guide-more {
+  margin-top: 16px;
+}
+.guide-more a {
+  color: #c6a8ff;
+  text-decoration: underline;
+}
+/* Advertising positions: fixed space prevents layout shift, kept clear of download controls */
+.ad-slot {
+  max-width: 890px;
+  margin: 40px auto 0;
+  min-height: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.editorial .ad-slot {
+  margin-top: 40px;
+}
+.ad-label {
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #6f6c80;
+}
+.ad-slot .adsbygoogle {
+  flex: 1;
+  min-height: 250px;
+}
+.ad-placeholder {
+  flex: 1;
+  min-height: 250px;
+  border: 1px dashed #3a3448;
+  border-radius: 9px;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  gap: 6px;
+  color: #8b86a0;
+  font-size: 13px;
+  background: repeating-linear-gradient(
+    135deg,
+    #15161c,
+    #15161c 12px,
+    #17181f 12px,
+    #17181f 24px
+  );
+}
+.ad-placeholder small {
+  font-size: 11px;
+  color: #6f6c80;
+}
+@media (max-width: 960px) {
+  .guide-steps {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 600px) {
+  .guide-steps {
+    grid-template-columns: 1fr;
+  }
+  .home-guide {
+    margin-top: 32px;
+  }
+  .ad-slot {
+    min-height: 300px;
+  }
+}
+.editorial code {
+  font-size: 14px;
+  background: #1d1a26;
+  border: 1px solid #332c40;
+  border-radius: 5px;
+  padding: 1px 6px;
+  color: #dccbff;
+  overflow-wrap: anywhere;
+}

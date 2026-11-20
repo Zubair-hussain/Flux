@@ -18,7 +18,7 @@ it("keeps unconfigured previews out of search and gives each page metadata", () 
     expect(meta.alternates?.canonical).toBe(`/${slug}`);
     expect(meta.openGraph).toBeDefined();
     expect(meta.twitter).toBeDefined();
-    expect(page.sections).toHaveLength(4);
+    expect(page.sections.length).toBeGreaterThanOrEqual(4);
   }
 });
 it("handles unconfigured Blogger without network access", async () => {
