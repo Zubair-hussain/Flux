@@ -119,12 +119,12 @@ Reports are saved to `reports/sightline/` (an HTML report and JSON per page, plu
 
 **CI:** [`.github/workflows/sightline.yml`](.github/workflows/sightline.yml) builds Flux exactly as it will be indexed at launch, runs Sightline on all 8 pages for every push and pull request, posts a score table to the job summary, and uploads the HTML reports as the `sightline-reports` artifact. Set the repository variable `FLUX_PUBLIC_URL` to also audit the live site every Monday, or start the workflow manually with any URL.
 
-Latest launch-mode results (20 November 2026, local build):
+Latest results from the Sightline CI run on GitHub (20 November 2026):
 
 | Page         | Overall | SEO | Links | Before this audit  |
 | ------------ | ------- | --- | ----- | ------------------ |
 | `/`          | 91      | 100 | 100   | 68 overall, SEO 67 |
-| `/about`     | 91      | 100 | 100   | SEO 64             |
+| `/about`     | 90      | 98  | 100   | SEO 64             |
 | `/blog`      | 90      | 98  | 100   | SEO 70             |
 | Policy pages | 90      | 98  | 100   | SEO 64–70          |
 
