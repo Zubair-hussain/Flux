@@ -30,8 +30,8 @@ export const pages = {
         "A Chrome extension sends the current tab to Flux without needing history or page access permissions. An MCP server lets assistants such as Claude inspect a link, start a download, and check its status through the same local API and safety rules as the website.",
       ],
       [
-        "Who operates this site",
-        "Operator name and contact details are pending configuration. This site is a preview until those details and its public domain are supplied.",
+        "Who runs Flux",
+        "Flux is built and operated by Zubair Hussain (zubairhussain.xyz). Questions, feedback, and requests can be sent to hello@zubairhussain.xyz.",
       ],
     ],
   },
@@ -55,7 +55,7 @@ export const pages = {
       ],
       [
         "Contact and requests",
-        "Privacy contact: [CONTACT_EMAIL — to be supplied]. Operator: [OPERATOR_NAME — to be supplied]. These placeholders must be replaced before collecting public user information.",
+        "This site is operated by Zubair Hussain. For privacy questions or requests about your information, email hello@zubairhussain.xyz and we will respond as soon as practical.",
       ],
     ],
   },
@@ -79,7 +79,7 @@ export const pages = {
       ],
       [
         "Your controls",
-        "You can manage site cookies and storage in browser settings. Contact details are pending: [CONTACT_EMAIL].",
+        "You can manage site cookies and storage in browser settings. Questions about cookies can be sent to hello@zubairhussain.xyz.",
       ],
     ],
   },
@@ -103,7 +103,7 @@ export const pages = {
       ],
       [
         "Operator and applicable terms",
-        "Operator: [OPERATOR_NAME]. Contact: [CONTACT_EMAIL]. Jurisdiction and legally required consumer terms must be completed and reviewed for the intended market before public launch.",
+        "Flux is operated by Zubair Hussain. Contact: hello@zubairhussain.xyz. Governing law and any legally required consumer terms should be reviewed for the intended market before public launch.",
       ],
     ],
   },
@@ -122,8 +122,8 @@ export const pages = {
         "For content published on this website, provide the affected page URL, identification of your work, your contact details, and a clear description of the concern.",
       ],
       [
-        "Contact pending",
-        "Send reports to [COPYRIGHT_EMAIL — to be supplied]. This preview does not claim to have a registered DMCA agent or a statutory takedown process.",
+        "How to report",
+        "Send reports to hello@zubairhussain.xyz with the subject line “Copyright”. This site does not claim to have a registered DMCA agent or a statutory takedown process.",
       ],
       [
         "Review process",
@@ -151,7 +151,7 @@ export const pages = {
       ],
       [
         "Corrections",
-        "Publish genuine author and review details, preserve original publication dates, and explain material corrections. Contact details are pending: [CONTACT_EMAIL].",
+        "Posts carry genuine author and review details, keep their original publication dates, and explain material corrections. Report errors to hello@zubairhussain.xyz.",
       ],
     ],
   },
