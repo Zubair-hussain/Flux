@@ -18,7 +18,7 @@ export const platforms = [
     name: "Instagram",
     short: "◎",
     color: "#ed82bd",
-    hosts: ["instagram.com"],
+    hosts: ["instagram.com", "instagr.am"],
   },
   {
     id: "reddit",
@@ -68,6 +68,37 @@ export const platforms = [
     short: "d",
     color: "#a7a9ff",
     hosts: ["dailymotion.com", "dai.ly"],
+  },
+  {
+    id: "pinterest",
+    name: "Pinterest",
+    short: "P",
+    color: "#ff6f7d",
+    hosts: [
+      "pinterest.com",
+      "pin.it",
+      "pinterest.ca",
+      "pinterest.co.uk",
+      "pinterest.de",
+      "pinterest.fr",
+      "pinterest.es",
+      "pinterest.it",
+      "pinterest.com.au",
+    ],
+  },
+  {
+    id: "streamable",
+    name: "Streamable",
+    short: "S",
+    color: "#8fd3ff",
+    hosts: ["streamable.com"],
+  },
+  {
+    id: "loom",
+    name: "Loom",
+    short: "L",
+    color: "#b9a2ff",
+    hosts: ["loom.com"],
   },
 ] as const;
 export type Quality = 720 | 1080 | 1440 | 2160 | 4320;

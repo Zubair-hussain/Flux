@@ -212,7 +212,8 @@ async function hasCommand(binary: string, args: string[]) {
   }
 }
 
-const minutes = (s: number) => `${Math.floor(s / 60)}m ${Math.round(s % 60)}s`;
+const minutes = (s: number) =>
+  s > 0 ? ` · ${Math.floor(s / 60)}m ${Math.round(s % 60)}s` : "";
 
 export async function main(
   argv: string[],
@@ -266,7 +267,7 @@ export async function main(
           log(JSON.stringify(rest, null, 2));
         } else
           log(
-            `${video.title}\n  ${video.creator} · ${video.platform} · ${minutes(video.duration)}\n  Qualities: ${video.qualities.map(qualityLabel).join(", ")}`,
+            `${video.title}\n  ${video.creator} · ${video.platform}${minutes(video.duration)}\n  Qualities: ${video.qualities.map(qualityLabel).join(", ")}`,
           );
         return 0;
       }

@@ -35,5 +35,14 @@
   {
     "platform": "Dailymotion",
     "url": "https://www.dailymotion.com/video/xbxi4vu"
+  },
+  {
+    "platform": "Pinterest",
+    "url": "https://www.pinterest.com/pin/664281013778109217/"
+  },
+  { "platform": "Streamable", "url": "https://streamable.com/dnd1" },
+  {
+    "platform": "Loom",
+    "url": "https://www.loom.com/share/43d05f362f734614a2e81b4694a3a523"
   }
 ]

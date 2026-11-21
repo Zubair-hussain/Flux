@@ -1,6 +1,6 @@
 # flux-downloader
 
-**One command to save public videos in their original quality**, from YouTube, TikTok, Instagram, X, LinkedIn, Twitch, Dailymotion and more. It works on Windows, macOS and Linux, needs no account, and never bypasses DRM.
+**One command to save public videos in their original quality**, from YouTube, TikTok, Instagram, X, LinkedIn, Twitch, Dailymotion, Pinterest, Streamable, Loom and more. It works on Windows, macOS and Linux, needs no account, and never bypasses DRM.
 
 ```bash
 node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ'
