@@ -23,6 +23,13 @@ A video being public does **not** give you the right to download, re-upload or m
 
 These safeguards are part of the code (`src/lib/policy.ts` and `src/lib/ytdlp.ts`). Anyone who removes them in a fork is responsible for the result.
 
+## Private, third-party and adult content
+
+- **Private content.** Flux cannot reach videos that need a sign-in, are private, or are limited to followers or friends, and it does not accept passwords, cookies or tokens, so it cannot be used to take private material. It only works on links anyone on the internet can open.
+- **Other people's public content.** A video being public does not make it free to reuse. Flux saves files only on the user's own device, does not host or republish anything, and reminds the user to have permission before every CLI download. What the user does next is their responsibility, and republishing someone else's work without permission can infringe copyright.
+- **Adult content and misuse.** Flux refuses links and metadata that look sexual or age-restricted and refuses age-restricted sources. This filter reads titles, descriptions, tags and platform flags. It **cannot see the pictures**, so it reduces misuse but cannot guarantee it. Flux does not download images, only video, and does not offer any way to publish or share what was saved.
+- **Reporting.** If you see Flux used to harm someone, or find content on the Flux website that infringes your rights, email hello@zubairhussain.xyz. Reports about a specific video should also go to the platform that hosts it, because only the platform can remove it.
+
 ## Trademarks
 
 YouTube, TikTok, Instagram, Facebook, X, Twitter, LinkedIn, Twitch, Reddit, Vimeo, Dailymotion and other names are trademarks of their respective owners. Flux is **not affiliated with, endorsed by, or sponsored by** any of them. Names are used only to describe compatibility.

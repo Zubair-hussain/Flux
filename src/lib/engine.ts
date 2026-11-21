@@ -6,6 +6,7 @@ import {
   writeFile,
   rename,
   readdir,
+  rm,
   stat,
 } from "node:fs/promises";
 import path from "node:path";
@@ -134,6 +135,35 @@ export async function getJob(id: string): Promise<Job> {
   }
   return job;
 }
+let lastPrune = 0;
+/** Deletes finished downloads older than FLUX_RETENTION_DAYS (default 7; 0 keeps everything). */
+export async function pruneOldJobs(now = Date.now()) {
+  const days = Number(process.env.FLUX_RETENTION_DAYS ?? 7);
+  if (!(days > 0)) return 0;
+  const cutoff = now - days * 86_400_000;
+  let names: string[];
+  try {
+    names = await readdir(root);
+  } catch {
+    return 0;
+  }
+  let removed = 0;
+  for (const name of names.filter((n) => /^[a-f0-9-]{36}\.json$/.test(n))) {
+    const id = name.slice(0, -5);
+    if (active.has(id)) continue;
+    try {
+      const job = JSON.parse(await readFile(jobPath(id), "utf8")) as Job;
+      if (!(Date.parse(job.createdAt) < cutoff)) continue;
+      await rm(path.join(root, id), { recursive: true, force: true });
+      await rm(jobPath(id), { force: true });
+      removed++;
+    } catch {
+      /* unreadable records are left for manual cleanup */
+    }
+  }
+  if (removed) jobLists.clear();
+  return removed;
+}
 export async function listJobs() {
   return jobLists.get("recent", readRecentJobs);
 }
@@ -153,6 +183,10 @@ export function publicJob(job: Job) {
 }
 export async function createJob(input: unknown, requestedQuality: unknown) {
   const quality = validateQuality(requestedQuality);
+  if (Date.now() - lastPrune > 3_600_000) {
+    lastPrune = Date.now();
+    void pruneOldJobs().catch(() => {});
+  }
   // Reserve a slot before metadata extraction to bound concurrent subprocesses.
   if (active.size >= 2)
     throw new AppError(

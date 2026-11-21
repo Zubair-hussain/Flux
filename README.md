@@ -167,6 +167,8 @@ Coverage covers backend and API code, with enforced thresholds; open `coverage/i
 
 Download only media you own or have permission to save. No DRM bypass, login-cookie import, playlists, current livestream recording, or sexual content. No account is required by Flux; source platforms may still restrict access. High-resolution media needs adequate disk space. Failed partial files require manual cleanup. This is a trusted local MVP, not a public multi-user service or a fully moderated product.
 
+Design and scaling notes are in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
+
 Implementation references: [Next.js App Router](https://nextjs.org/docs/app), [yt-dlp format selection](https://github.com/yt-dlp/yt-dlp#format-selection), [MCP SDK](https://ts.sdk.modelcontextprotocol.io/), [Chrome extension documentation](https://developer.chrome.com/docs/extensions/develop).
 
 ## Legal and responsible use

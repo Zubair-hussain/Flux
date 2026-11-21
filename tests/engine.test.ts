@@ -32,6 +32,9 @@ vi.mock("node:fs/promises", () => ({
       : mocks.names,
   ),
   stat: vi.fn(async () => ({ size: 123 })),
+  rm: vi.fn(async (target: string) => {
+    mocks.files.delete(target);
+  }),
 }));
 import {
   createJob,
@@ -39,6 +42,7 @@ import {
   getJob,
   inspectVideo,
   listJobs,
+  pruneOldJobs,
   publicJob,
 } from "../src/lib/engine";
 const metadata = {
@@ -211,6 +215,25 @@ describe("download engine", () => {
       a.includes("--format"),
     )![1];
     expect(args[args.indexOf("--format") + 1]).toMatch(/\/1$/);
+  });
+  it("deletes finished downloads older than the retention period", async () => {
+    const dir = path.join(process.cwd(), "downloads");
+    const oldId = "aaaaaaaa-1234-1234-1234-123456789abc";
+    const newId = "bbbbbbbb-1234-1234-1234-123456789abc";
+    const record = (jobId: string, ageDays: number) =>
+      JSON.stringify({
+        id: jobId,
+        status: "complete",
+        createdAt: new Date(Date.now() - ageDays * 86_400_000).toISOString(),
+      });
+    mocks.files.set(path.join(dir, `${oldId}.json`), record(oldId, 30));
+    mocks.files.set(path.join(dir, `${newId}.json`), record(newId, 1));
+    expect(await pruneOldJobs()).toBe(1);
+    expect(mocks.files.has(path.join(dir, `${oldId}.json`))).toBe(false);
+    expect(mocks.files.has(path.join(dir, `${newId}.json`))).toBe(true);
+    vi.stubEnv("FLUX_RETENTION_DAYS", "0");
+    expect(await pruneOldJobs()).toBe(0);
+    vi.unstubAllEnvs();
   });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];

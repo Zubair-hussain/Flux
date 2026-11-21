@@ -3,13 +3,20 @@
 import { qualities, type Quality } from "./platforms";
 import { AppError } from "./policy";
 
+export const safeModuleLauncher =
+  "import sys,runpy;sys.path[:]=[p for p in sys.path if p not in ('','.')];runpy.run_module('yt_dlp',run_name='__main__',alter_sys=True)";
+
 /** Executable and fixed safety flags; per-call arguments are appended. */
 export function ytdlpCommand(
   args: string[],
   env: Record<string, string | undefined> = process.env,
 ) {
   const binary = env.YTDLP_PATH || env.PYTHON_PATH || "python";
-  const prefix = env.YTDLP_PATH ? [] : ["-m", "yt_dlp"];
+  // `python -m` puts the current folder first on the import path, so a stray
+  // yt_dlp.py in the folder Flux runs from would execute as the downloader.
+  // Drop the current folder before importing (works on every Python version,
+  // unlike -P/PYTHONSAFEPATH which need 3.11+).
+  const prefix = env.YTDLP_PATH ? [] : ["-c", safeModuleLauncher];
   return {
     binary,
     args: [
