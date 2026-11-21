@@ -235,6 +235,26 @@ describe("download engine", () => {
     expect(await pruneOldJobs()).toBe(0);
     vi.unstubAllEnvs();
   });
+  it("retries with single-file formats first when the first download fails", async () => {
+    let downloads = 0;
+    mocks.run.mockImplementation(async (_binary, args: string[]) => {
+      if (args.includes("--dump-single-json"))
+        return { stdout: JSON.stringify(metadata) };
+      if (args.includes("--format") && ++downloads === 1)
+        throw new Error("fragments failed");
+      return { stdout: "" };
+    });
+    const job = await createJob("https://youtu.be/abc", 1080);
+    await vi.waitFor(async () =>
+      expect((await getJob(job.id)).status).toBe("complete"),
+    );
+    const selectors = mocks.run.mock.calls
+      .filter(([, a]) => a.includes("--format"))
+      .map(([, a]) => a[a.indexOf("--format") + 1]);
+    expect(selectors).toHaveLength(2);
+    expect(selectors[0]).toMatch(/^bv\[height=1080\]/);
+    expect(selectors[1]).toMatch(/^b\[height=1080\]/);
+  });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];
     const job = await createJob("https://youtu.be/abc", 1080);

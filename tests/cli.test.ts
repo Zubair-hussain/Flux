@@ -101,6 +101,27 @@ describe("flux CLI", () => {
     );
     expect(mocks.spawnArgs.at(-2)).toBe("--");
   });
+  it("retries once with single-file formats first, with a short file name", async () => {
+    const attempts: string[][] = [];
+    mocks.spawnCode = 1;
+    const { spawn } = await import("node:child_process");
+    vi.mocked(spawn).mockImplementationOnce(((_b: string, args: string[]) => {
+      attempts.push(args);
+      mocks.spawnArgs = args;
+      const { EventEmitter } = require("node:events");
+      const child = new EventEmitter();
+      setTimeout(() => child.emit("close", 1));
+      return child;
+    }) as never);
+    mocks.spawnCode = 0;
+    const { code, out } = await run("https://youtu.be/abc", "-q", "720");
+    expect(code).toBe(0);
+    expect(out).toContain("Retrying");
+    expect(mocks.spawnArgs[mocks.spawnArgs.indexOf("--format") + 1]).toMatch(
+      /^b\[height=720\]/,
+    );
+    expect(mocks.spawnArgs.join(" ")).toContain("%(title).60B");
+  });
   it("enforces the content policy and explains failures", async () => {
     mocks.exec.mockResolvedValue({
       stdout: JSON.stringify({ ...video, age_limit: 18 }),

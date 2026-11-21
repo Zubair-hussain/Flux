@@ -9,6 +9,7 @@ import { AppError, enforceContentPolicy, validateUrl } from "../lib/policy";
 import {
   downloadSafetyArgs,
   formatSelector,
+  outputTemplate,
   sourceQualities,
   ytdlpCommand,
 } from "../lib/ytdlp";
@@ -276,20 +277,29 @@ export async function main(
         log(
           `▶ ${video.title}\n  ${video.platform} · ${qualityLabel(quality)} → ${options.output}\n  Only keep videos you own or have permission to save.`,
         );
-        const command = ytdlpCommand([
-          ...downloadSafetyArgs,
-          "--format",
-          formatSelector(quality, video.formatIds[quality]),
-          "--merge-output-format",
-          "mkv",
-          "--windows-filenames",
-          "--output",
-          path.join(options.output, "%(title).120B [%(id)s].%(ext)s"),
-          "--",
-          video.url,
-        ]);
+        const attempt = (directFirst: boolean) => {
+          const command = ytdlpCommand([
+            ...downloadSafetyArgs,
+            "--format",
+            formatSelector(quality, video.formatIds[quality], directFirst),
+            "--merge-output-format",
+            "mkv",
+            "--windows-filenames",
+            "--output",
+            path.join(options.output, outputTemplate),
+            "--",
+            video.url,
+          ]);
+          return runDownload(command.binary, command.args);
+        };
         try {
-          await runDownload(command.binary, command.args);
+          try {
+            await attempt(false);
+          } catch (error) {
+            if (!(error instanceof AppError)) throw error;
+            log("↻ Retrying with single-file formats first…");
+            await attempt(true);
+          }
         } catch (error) {
           if (error instanceof AppError) throw error;
           engineError(error);

@@ -96,8 +96,27 @@ export function sourceQualities(formats: Format[]) {
   return { qualities: available, formatIds };
 }
 
-/** Exact-resolution selector; never falls back to a different quality. */
-export function formatSelector(quality: Quality, labelledFormat?: string) {
+/**
+ * Exact-resolution selector; never falls back to a different quality.
+ * `directFirst` tries single-file formats before separate video+audio streams.
+ * Some sources (X) offer both, and the streamed pieces can fail to download
+ * while the direct file works, so a failed first attempt is retried this way.
+ */
+export function formatSelector(
+  quality: Quality,
+  labelledFormat?: string,
+  directFirst = false,
+) {
   const q = quality;
-  return `bv[height=${q}][width>=?${q}]+ba/b[height=${q}][width>=?${q}]/bv[width=${q}][height>${q}]+ba/b[width=${q}][height>${q}]${labelledFormat ? `/${labelledFormat}` : ""}`;
+  const merged = `bv[height=${q}][width>=?${q}]+ba`;
+  const single = `b[height=${q}][width>=?${q}]`;
+  const merged2 = `bv[width=${q}][height>${q}]+ba`;
+  const single2 = `b[width=${q}][height>${q}]`;
+  const order = directFirst
+    ? [single, merged, single2, merged2]
+    : [merged, single, merged2, single2];
+  return `${order.join("/")}${labelledFormat ? `/${labelledFormat}` : ""}`;
 }
+
+/** Output name that stays inside Windows' path limit even for long, hashtag-filled titles. */
+export const outputTemplate = "%(title).60B [%(id)s].%(ext)s";

@@ -225,20 +225,28 @@ async function processJob(job: Job, url: string, labelledFormat?: string) {
     await save(job);
     const folder = path.join(root, job.id);
     await mkdir(folder, { recursive: true });
-    await run(
-      [
-        ...downloadSafetyArgs,
-        "--format",
-        formatSelector(job.quality, labelledFormat),
-        "--merge-output-format",
-        "mkv",
-        "--output",
-        path.join(folder, "video.%(ext)s"),
-        "--",
-        url,
-      ],
-      30 * 60 * 1000,
-    );
+    const download = (directFirst: boolean) =>
+      run(
+        [
+          ...downloadSafetyArgs,
+          "--format",
+          formatSelector(job.quality, labelledFormat, directFirst),
+          "--merge-output-format",
+          "mkv",
+          "--output",
+          path.join(folder, "video.%(ext)s"),
+          "--",
+          url,
+        ],
+        30 * 60 * 1000,
+      );
+    try {
+      await download(false);
+    } catch (error) {
+      // Streamed pieces can fail where the single file works (seen on X).
+      if (error instanceof AppError && error.status === 503) throw error;
+      await download(true);
+    }
     const files = (await readdir(folder)).filter((f) =>
       /^video\.(mp4|mkv|webm|mov)$/.test(f),
     );
