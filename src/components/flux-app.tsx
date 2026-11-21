@@ -23,6 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { platforms, qualityLabel, type Quality } from "@/lib/platforms";
+import { useTurnstile } from "@/components/use-turnstile";
 import type { Job, VideoInfo } from "@/lib/types";
 import { version as cliVersion } from "../../packages/cli/package.json";
 
@@ -109,6 +110,7 @@ export function FluxApp({
   guide,
   mode = "local",
   apiBase = "",
+  turnstileSiteKey,
 }: {
   guide?: React.ReactNode;
   /**
@@ -119,9 +121,12 @@ export function FluxApp({
   mode?: AppMode;
   /** Address of the Flux server in remote mode (empty = same website). */
   apiBase?: string;
+  /** Cloudflare Turnstile site key; when set, each lookup and download carries a fresh token. */
+  turnstileSiteKey?: string;
 }) {
   const publicSite = mode === "command";
   const remote = mode === "remote";
+  const human = useTurnstile(mode === "remote" ? turnstileSiteKey : undefined);
   const call = <T,>(path: string, body?: unknown, signal?: AbortSignal) =>
     api<T>(`${apiBase}${path}`, body, signal);
   const friendly = (e: unknown) =>
@@ -261,7 +266,11 @@ export function FluxApp({
     setError("");
     setVideo(null);
     try {
-      const data = await call<VideoInfo>("/api/inspect", { url });
+      const turnstileToken = await human.getToken();
+      const data = await call<VideoInfo>("/api/inspect", {
+        url,
+        ...(turnstileToken ? { turnstileToken } : {}),
+      });
       setVideo(data);
       setQuality(data.qualities.at(-1)!);
     } catch (e) {
@@ -275,9 +284,11 @@ export function FluxApp({
     setBusy(true);
     setError("");
     try {
+      const turnstileToken = await human.getToken();
       const job = await call<Job>("/api/downloads", {
         url: video.url,
         quality,
+        ...(turnstileToken ? { turnstileToken } : {}),
       });
       if (remote) writeIds([job.id, ...readIds()]);
       setJobs((old) => [job, ...old]);
@@ -504,6 +515,9 @@ export function FluxApp({
                     </button>
                   </div>
                 </form>
+                {human.enabled && (
+                  <div ref={human.box} className="turnstile-box" />
+                )}
                 {error && (
                   <p className="error" role="alert">
                     {error}

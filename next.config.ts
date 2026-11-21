@@ -28,16 +28,20 @@ export function contentSecurityPolicy(env: Env = process.env): string {
   } catch {
     /* invalid address: no extra origin is allowed */
   }
+  // Cloudflare Turnstile (bot check) loads its script, frame and API from here.
+  const turnstile = env.NEXT_PUBLIC_TURNSTILE_SITE_KEY
+    ? " https://challenges.cloudflare.com"
+    : "";
   // Next.js injects inline bootstrap scripts, so 'unsafe-inline' is required
   // without a per-request nonce. Everything else stays first-party.
   return [
     "default-src 'self'",
-    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}${adHosts}`,
+    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""}${adHosts}${turnstile}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob:${ads ? " https:" : ""}`,
     "font-src 'self'",
-    `connect-src 'self'${api}${adHosts}${dev ? " ws: wss:" : ""}`,
-    `frame-src ${ads ? adHosts.trim() : "'none'"}`,
+    `connect-src 'self'${api}${adHosts}${turnstile}${dev ? " ws: wss:" : ""}`,
+    `frame-src ${ads || turnstile ? `${adHosts}${turnstile}`.trim() : "'none'"}`,
     "media-src 'self' blob:",
     "object-src 'none'",
     "base-uri 'self'",

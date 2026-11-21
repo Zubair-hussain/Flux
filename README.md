@@ -145,7 +145,7 @@ Fixed from the audit: security headers (CSP, `nosniff`, `X-Frame-Options`, `Refe
 
 ## Download box on the website (optional)
 
-The website can offer a real download box next to the command-line option. It needs a small Flux server, because Cloudflare Workers cannot run yt-dlp or FFmpeg. The server ships as a Docker image with per-visitor rate limits, size, length and resolution caps, automatic deletion after an hour, and the same content rules as the local app. Without it, the website shows the command-line option only. Setup, costs and risks are in [docs/HOSTED-SERVER.md](docs/HOSTED-SERVER.md).
+The website can offer a real download box next to the command-line option. It needs a small Flux server, because Cloudflare Workers cannot run yt-dlp or FFmpeg. The server ships as a Docker image with per-visitor rate limits, size, length and resolution caps, automatic deletion after an hour, optional Cloudflare Turnstile bot protection, and the same content rules as the local app. Without it, the website shows the command-line option only. Setup, costs and risks are in [docs/HOSTED-SERVER.md](docs/HOSTED-SERVER.md).
 
 ## Deploy (Cloudflare)
 

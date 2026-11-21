@@ -54,24 +54,36 @@ Without `NEXT_PUBLIC_FLUX_API`, the Cloudflare site keeps showing only the comma
 
 ## Settings
 
-| Variable               | Default in the image | Meaning                                                                                             |
-| ---------------------- | -------------------- | --------------------------------------------------------------------------------------------------- |
-| `FLUX_HOSTED`          | `true`               | Turns on hosted mode (public host allowed, per-visitor limits, no list of other people's downloads) |
-| `FLUX_ALLOWED_ORIGINS` | empty                | Comma-separated websites allowed to call the API from a browser                                     |
-| `FLUX_MAX_HEIGHT`      | `1080`               | Highest resolution offered on the server. Visitors needing more are pointed to the CLI              |
-| `FLUX_MAX_FILESIZE`    | `1G`                 | Largest file a download may produce                                                                 |
-| `FLUX_MAX_DURATION`    | `1800`               | Longest video in seconds                                                                            |
-| `FLUX_MAX_CONCURRENT`  | `3`                  | Downloads running at once on this server                                                            |
-| `FLUX_RATE_INSPECT`    | `30`                 | Lookups per visitor per 10 minutes (`0` turns the limit off)                                        |
-| `FLUX_RATE_DOWNLOAD`   | `8`                  | Downloads per visitor per hour (`0` turns the limit off)                                            |
-| `FLUX_RETENTION_HOURS` | `1`                  | Finished files are deleted after this many hours                                                    |
+| Variable                         | Default in the image | Meaning                                                                                                 |
+| -------------------------------- | -------------------- | ------------------------------------------------------------------------------------------------------- |
+| `FLUX_HOSTED`                    | `true`               | Turns on hosted mode (public host allowed, per-visitor limits, no list of other people's downloads)     |
+| `FLUX_ALLOWED_ORIGINS`           | empty                | Comma-separated websites allowed to call the API from a browser                                         |
+| `FLUX_MAX_HEIGHT`                | `1080`               | Highest resolution offered on the server. Visitors needing more are pointed to the CLI                  |
+| `FLUX_MAX_FILESIZE`              | `1G`                 | Largest file a download may produce                                                                     |
+| `FLUX_MAX_DURATION`              | `1800`               | Longest video in seconds                                                                                |
+| `FLUX_MAX_CONCURRENT`            | `3`                  | Downloads running at once on this server                                                                |
+| `FLUX_RATE_INSPECT`              | `30`                 | Lookups per visitor per 10 minutes (`0` turns the limit off)                                            |
+| `FLUX_RATE_DOWNLOAD`             | `8`                  | Downloads per visitor per hour (`0` turns the limit off)                                                |
+| `FLUX_RETENTION_HOURS`           | `1`                  | Finished files are deleted after this many hours                                                        |
+| `TURNSTILE_SECRET_KEY`           | empty                | Turns on the Turnstile bot check on the server. A runtime secret: never put it in the image or the repo |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | empty                | Public Turnstile site key the website uses to show the check. Set at build time                         |
 
 The visitor address comes from `cf-connecting-ip`, `fly-client-ip` or `x-forwarded-for`, so run the server behind Cloudflare or another proxy that sets one of them. Without a proxy, every visitor shares one limit bucket.
+
+## Bot protection (Cloudflare Turnstile)
+
+Turnstile is Cloudflare's free CAPTCHA alternative. It is invisible for most people and only asks for a click when a visit looks automated. When it is on, every lookup and every download needs a fresh one-time token, and the server checks it with Cloudflare before doing any work. If Cloudflare cannot be reached, requests are refused rather than let through.
+
+1. In the Cloudflare dashboard open **Turnstile → Add widget**, add your website's domain, and choose "Managed". You get a **site key** (public) and a **secret key** (private).
+2. Build the website (or the Docker image) with the site key: `--build-arg NEXT_PUBLIC_TURNSTILE_SITE_KEY=<site key>` for Docker, or the same variable in the Cloudflare site build.
+3. Run the server with the secret: `docker run -e TURNSTILE_SECRET_KEY=<secret key> ...`.
+
+Both keys must be set. With only the secret, visitors cannot get a token and every request is refused. With only the site key, the check is simply not enforced. Cloudflare publishes test keys for trying it out: the site key `1x00000000000000000000AA` with the secret `1x0000000000000000000000000000000AA` always passes, and the secret `2x0000000000000000000000000000000AA` always fails. The check was tested end to end with these.
 
 ## Before you turn it on for real
 
 - [ ] Use a server with enough bandwidth and disk. One 1080p video is about 50–250 MB. A hosting plan with capped transfer can get expensive fast.
-- [ ] Put Cloudflare in front, with "Always use HTTPS", and consider Turnstile (a free CAPTCHA) on the download button. It stops most bots. It is not built in yet.
+- [ ] Put Cloudflare in front, with "Always use HTTPS", and turn on the Turnstile bot check (next section).
 - [ ] Read the privacy and terms pages. They now describe the download box, and a lawyer should review them. See [LEGAL.md](../LEGAL.md) and issue #6.
 - [ ] Read Google AdSense's policies on downloader sites before you put ads on a site that downloads for visitors.
 - [ ] Monitor disk use, errors and the number of downloads, and be ready to switch the box off by redeploying without `NEXT_PUBLIC_FLUX_API`.

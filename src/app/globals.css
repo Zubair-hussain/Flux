@@ -1729,3 +1729,11 @@ footer {
     justify-content: center;
   }
 }
+.turnstile-box {
+  display: flex;
+  justify-content: center;
+  margin-top: 12px;
+}
+.turnstile-box:empty {
+  display: none;
+}

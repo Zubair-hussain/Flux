@@ -20,13 +20,16 @@ COPY . .
 ARG SITE_URL=http://localhost:3000
 ARG SEO_INDEXABLE=false
 ARG NEXT_PUBLIC_FLUX_API=
+ARG NEXT_PUBLIC_TURNSTILE_SITE_KEY=
 ENV FLUX_HOSTED=true \
     SITE_URL=${SITE_URL} \
     SEO_INDEXABLE=${SEO_INDEXABLE} \
-    NEXT_PUBLIC_FLUX_API=${NEXT_PUBLIC_FLUX_API}
+    NEXT_PUBLIC_FLUX_API=${NEXT_PUBLIC_FLUX_API} \
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY=${NEXT_PUBLIC_TURNSTILE_SITE_KEY}
 RUN npm run build
 
 # Limits for a public server; override at run time with -e.
+# Set TURNSTILE_SECRET_KEY at run time (never in the image) to require the bot check.
 ENV NODE_ENV=production \
     PYTHON_PATH=python3 \
     FLUX_MAX_FILESIZE=1G \

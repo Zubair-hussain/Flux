@@ -69,6 +69,9 @@ export default function Home() {
       <FluxApp
         mode={mode}
         apiBase={apiBase}
+        turnstileSiteKey={
+          process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || undefined
+        }
         guide={
           <>
             <AdSlot placement="home" />
