@@ -27,13 +27,14 @@ Flux is an open-source, local-first video downloader by [Zubair Hussain](https:/
 3. [Run the web app](#run)
 4. [Included](#included)
 5. [Website audit (Sightline)](#website-audit-sightline)
-6. [Deploy (Cloudflare)](#deploy-cloudflare)
-7. [Checks](#checks)
-8. [Demo video](#demo-video)
-9. [Limits](#limits)
-10. [Legal and responsible use](#legal-and-responsible-use)
-11. [Contributing](#contributing)
-12. [License](#license)
+6. [Download box on the website (optional)](#download-box-on-the-website-optional)
+7. [Deploy (Cloudflare)](#deploy-cloudflare)
+8. [Checks](#checks)
+9. [Demo video](#demo-video)
+10. [Limits](#limits)
+11. [Legal and responsible use](#legal-and-responsible-use)
+12. [Contributing](#contributing)
+13. [License](#license)
 
 ## See it work
 
@@ -49,12 +50,12 @@ Flux is an open-source, local-first video downloader by [Zubair Hussain](https:/
 
 Paste a public link, Flux reads the real source resolutions, you pick a quality, it downloads in the background, then you save the file. This is a real recording of a TikTok download (`npm run demo:video` records it again; see [Demo video](#demo-video)).
 
-| What Flux is for                                                |                                                                                       |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Saving your own or permitted videos in the **original quality** | 720p, 1080p, 1440p, 4K and 8K, only when the source has it. Never upscaled            |
-| **One place** for many platforms                                | YouTube, TikTok, Instagram, X, Twitch, LinkedIn, Dailymotion and more                 |
-| Keeping files **private**                                       | Runs on your computer. No account, and files never pass through someone else's server |
-| **Browser and AI workflows**                                    | Chrome extension and an MCP server for Claude, Codex and other agents                 |
+| What Flux is for                                                |                                                                                                    |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| Saving your own or permitted videos in the **original quality** | 720p, 1080p, 1440p, 4K and 8K, only when the source has it. Never upscaled                         |
+| **One place** for many platforms                                | YouTube, TikTok, Instagram, X, Twitch, LinkedIn, Dailymotion, Pinterest, Streamable, Loom and more |
+| Keeping files **private**                                       | Runs on your computer. No account, and files never pass through someone else's server              |
+| **Browser and AI workflows**                                    | Chrome extension and an MCP server for Claude, Codex and other agents                              |
 
 ## One-command CLI
 
@@ -104,7 +105,7 @@ Successful inspections are reused for 60 seconds, including when starting a down
 
 - [Blog](/blog), About, Privacy, Cookies, Terms, Copyright, and Content Policy pages with breadcrumbs, canonical metadata, social cards, and preview-safe indexing. Blogger connection, public-domain configuration, and Cloudflare/D1 preparation are documented in [SEO and hosting](docs/SEO-AND-HOSTING.md). Placeholders are intentional; cloud services are not provisioned.
 
-- YouTube, TikTok, Reddit, LinkedIn, Instagram, Twitch, X, Vimeo, Facebook, and Dailymotion domain support through yt-dlp. Source access and extractor support vary. Real download check on 21 November 2026 with the `flux` CLI at 720p (a file was saved and verified with ffprobe, with audio): **YouTube, TikTok, Instagram, Twitch, Dailymotion and LinkedIn download correctly**. **X works but is very slow** (about 15 KB/s from the test network, so it can take an hour; Flux retries with single-file formats first). **Reddit and Vimeo** now require sign-in, which Flux deliberately does not support, and **Facebook** fails inside yt-dlp's own extractor (upstream). See the [open issues](https://github.com/Zubair-hussain/Flux/issues) for the plan.
+- YouTube, TikTok, Reddit, LinkedIn, Instagram, Twitch, X, Vimeo, Facebook, Dailymotion, Pinterest, Streamable, and Loom domain support through yt-dlp. Source access and extractor support vary. Real download check on 21 November 2026 with the `flux` CLI at 720p (a file was saved and verified with ffprobe, with audio): **YouTube, TikTok, Instagram, Twitch, Dailymotion, LinkedIn, Pinterest, Streamable and Loom download correctly**. **X works but is very slow** (about 15 KB/s from the test network, so it can take an hour; Flux retries with single-file formats first). **Reddit and Vimeo** now require sign-in, which Flux deliberately does not support, and **Facebook** fails inside yt-dlp's own extractor (upstream). See the [open issues](https://github.com/Zubair-hussain/Flux/issues) for the plan.
 - Exact source resolutions: 720p, 1080p, 1440p, 4K, 8K; never upscale. Video/audio merging uses FFmpeg, typically producing MKV for codec compatibility.
 - URL and metadata filtering for sexual/NSFW and age-restricted content. **Metadata filtering cannot guarantee visual content safety**; see [content policy](docs/CONTENT-POLICY.md).
 - Download queue/status and streamed local files; two concurrent download slots, restart detection, no shell interpolation, no client-controlled filesystem paths.
@@ -141,6 +142,10 @@ Latest results from the Sightline CI run on GitHub (20 November 2026):
 | Policy pages | 90      | 98  | 100   | SEO 64–70          |
 
 Fixed from the audit: security headers (CSP, `nosniff`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, and HSTS on HTTPS), `WebSite`/`WebApplication`/`FAQPage` JSON-LD, a server-rendered how-to guide and FAQ on the homepage, 30–60 character page titles, and fuller About/Blog content. The remaining website-health items (HTTPS redirect, Brotli, HTTP/3) come from the host or CDN, for example Cloudflare, so they cannot pass on a local build. The "render-blocking script" note refers to Next.js's `nomodule` legacy polyfill, which modern browsers skip. Policy pages keep a word-count note because they are intentionally short.
+
+## Download box on the website (optional)
+
+The website can offer a real download box next to the command-line option. It needs a small Flux server, because Cloudflare Workers cannot run yt-dlp or FFmpeg. The server ships as a Docker image with per-visitor rate limits, size, length and resolution caps, automatic deletion after an hour, and the same content rules as the local app. Without it, the website shows the command-line option only. Setup, costs and risks are in [docs/HOSTED-SERVER.md](docs/HOSTED-SERVER.md).
 
 ## Deploy (Cloudflare)
 

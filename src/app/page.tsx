@@ -1,10 +1,10 @@
-import { FluxApp } from "@/components/flux-app";
-import { HomeGuide, homeFaq } from "@/components/home-guide";
+import { FluxApp, type AppMode } from "@/components/flux-app";
+import { HomeGuide, faqFor } from "@/components/home-guide";
 import { AdSlot } from "@/components/adsense";
 import { siteUrl } from "@/lib/site";
 import { platforms } from "@/lib/platforms";
 
-const jsonLd = {
+const buildJsonLd = (mode: AppMode) => ({
   "@context": "https://schema.org",
   "@graph": [
     {
@@ -41,32 +41,45 @@ const jsonLd = {
     },
     {
       "@type": "FAQPage",
-      mainEntity: homeFaq.map(([q, a]) => ({
+      mainEntity: faqFor(mode).map(([q, a]) => ({
         "@type": "Question",
         name: q,
         acceptedAnswer: { "@type": "Answer", text: a },
       })),
     },
   ],
-};
+});
+
+/** local: own computer · command: website builds a CLI command · remote: website downloads through a Flux server. */
+function appMode(): { mode: AppMode; apiBase: string } {
+  const apiBase = (process.env.NEXT_PUBLIC_FLUX_API || "").replace(/\/$/, "");
+  if (process.env.FLUX_HOSTED === "true")
+    return { mode: "remote", apiBase: "" };
+  if (process.env.FLUX_PUBLIC_SITE === "true")
+    return apiBase
+      ? { mode: "remote", apiBase }
+      : { mode: "command", apiBase: "" };
+  return { mode: "local", apiBase: "" };
+}
 
 export default function Home() {
-  const publicSite = process.env.FLUX_PUBLIC_SITE === "true";
+  const { mode, apiBase } = appMode();
   return (
     <>
       <FluxApp
-        publicSite={publicSite}
+        mode={mode}
+        apiBase={apiBase}
         guide={
           <>
             <AdSlot placement="home" />
-            <HomeGuide publicSite={publicSite} />
+            <HomeGuide mode={mode} />
           </>
         }
       />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+          __html: JSON.stringify(buildJsonLd(mode)).replace(/</g, "\\u003c"),
         }}
       />
     </>

@@ -17,9 +17,10 @@ import {
   validateQuality,
   validateUrl,
 } from "./policy";
-import type { Quality } from "./platforms";
+import { qualityLabel, type Quality } from "./platforms";
 import type { Job, VideoInfo } from "./types";
 import { AsyncCache } from "./async-cache";
+import { limits } from "./hosted";
 import {
   downloadSafetyArgs,
   formatSelector,
@@ -90,9 +91,17 @@ async function extractVideo(
     await run(["--dump-single-json", "--skip-download", "--", url]),
   );
   enforceContentPolicy(info);
-  const { qualities: available, formatIds } = sourceQualities(
+  const found = sourceQualities(
     Array.isArray(info.formats) ? info.formats : [],
   );
+  const formatIds = found.formatIds;
+  const maxHeight = limits().maxHeight;
+  const available = found.qualities.filter((q) => q <= maxHeight);
+  if (!available.length)
+    throw new AppError(
+      `This server offers up to ${qualityLabel(maxHeight)}, but this video starts higher. Use the flux command on your own computer.`,
+      422,
+    );
   let thumbnail: string | undefined;
   try {
     const u = new URL(info.thumbnail);
@@ -136,11 +145,18 @@ export async function getJob(id: string): Promise<Job> {
   return job;
 }
 let lastPrune = 0;
-/** Deletes finished downloads older than FLUX_RETENTION_DAYS (default 7; 0 keeps everything). */
+/** Retention in milliseconds: FLUX_RETENTION_HOURS, else FLUX_RETENTION_DAYS (default 7 days; 0 keeps everything). */
+function retentionMs() {
+  const hours = process.env.FLUX_RETENTION_HOURS;
+  return hours !== undefined && hours !== ""
+    ? Number(hours) * 3_600_000
+    : Number(process.env.FLUX_RETENTION_DAYS ?? 7) * 86_400_000;
+}
+/** Deletes finished downloads older than the retention period. */
 export async function pruneOldJobs(now = Date.now()) {
-  const days = Number(process.env.FLUX_RETENTION_DAYS ?? 7);
-  if (!(days > 0)) return 0;
-  const cutoff = now - days * 86_400_000;
+  const keep = retentionMs();
+  if (!(keep > 0)) return 0;
+  const cutoff = now - keep;
   let names: string[];
   try {
     names = await readdir(root);
@@ -183,14 +199,18 @@ export function publicJob(job: Job) {
 }
 export async function createJob(input: unknown, requestedQuality: unknown) {
   const quality = validateQuality(requestedQuality);
-  if (Date.now() - lastPrune > 3_600_000) {
+  const keep = retentionMs();
+  if (keep > 0 && Date.now() - lastPrune > Math.min(3_600_000, keep / 2)) {
     lastPrune = Date.now();
     void pruneOldJobs().catch(() => {});
   }
   // Reserve a slot before metadata extraction to bound concurrent subprocesses.
-  if (active.size >= 2)
+  const { maxConcurrent } = limits();
+  if (active.size >= maxConcurrent)
     throw new AppError(
-      "Two downloads are already running. Try again when one finishes.",
+      maxConcurrent === 2
+        ? "Two downloads are already running. Try again when one finishes."
+        : `${maxConcurrent} downloads are already running. Try again in a minute.`,
       429,
     );
   const id = randomUUID();

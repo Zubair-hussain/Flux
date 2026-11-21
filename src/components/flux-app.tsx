@@ -85,14 +85,49 @@ function PlatformIcon({ id, short }: { id: string; short: string }) {
     );
   return <span aria-hidden="true">{short}</span>;
 }
+export type AppMode = "local" | "command" | "remote";
+const jobsKey = "flux-my-downloads";
+const readIds = (): string[] => {
+  try {
+    const ids = JSON.parse(localStorage.getItem(jobsKey) || "[]");
+    return Array.isArray(ids)
+      ? ids.filter((id) => /^[a-f0-9-]{36}$/.test(id)).slice(0, 20)
+      : [];
+  } catch {
+    return [];
+  }
+};
+const writeIds = (ids: string[]) => {
+  try {
+    localStorage.setItem(jobsKey, JSON.stringify(ids.slice(0, 20)));
+  } catch {
+    /* private mode: downloads still work, they just are not remembered */
+  }
+};
+
 export function FluxApp({
   guide,
-  publicSite = false,
+  mode = "local",
+  apiBase = "",
 }: {
   guide?: React.ReactNode;
-  /** Hosted website: downloads run on the visitor's computer via the CLI. */
-  publicSite?: boolean;
+  /**
+   * local: the app on the user's own computer.
+   * command: website that only builds a `flux` command.
+   * remote: website that downloads through a Flux server, with the command as an alternative.
+   */
+  mode?: AppMode;
+  /** Address of the Flux server in remote mode (empty = same website). */
+  apiBase?: string;
 }) {
+  const publicSite = mode === "command";
+  const remote = mode === "remote";
+  const call = <T,>(path: string, body?: unknown, signal?: AbortSignal) =>
+    api<T>(`${apiBase}${path}`, body, signal);
+  const friendly = (e: unknown) =>
+    remote && e instanceof TypeError
+      ? "The download server is not reachable right now. Use the command-line option instead."
+      : (e as Error).message;
   const [url, setUrl] = useState("");
   const [video, setVideo] = useState<VideoInfo | null>(null);
   const [quality, setQuality] = useState<Quality>(1080);
@@ -125,16 +160,40 @@ export function FluxApp({
       clearTimeout(timer);
       refreshing = true;
       try {
-        const data = await api<Job[]>(
-          "/api/downloads",
-          undefined,
-          controller.signal,
-        );
+        let data: Job[];
+        if (remote) {
+          // A public server never lists everyone's downloads: follow only our own.
+          const ids = readIds();
+          const settled = await Promise.allSettled(
+            ids.map((id) =>
+              call<Job>(`/api/downloads/${id}`, undefined, controller.signal),
+            ),
+          );
+          data = settled.flatMap((r) =>
+            r.status === "fulfilled" ? [r.value] : [],
+          );
+          const live = new Set(data.map((j) => j.id));
+          const gone = settled.some(
+            (r, i) =>
+              r.status === "rejected" &&
+              /not found/i.test(String((r.reason as Error).message)) &&
+              !live.has(ids[i]),
+          );
+          if (gone) writeIds(ids.filter((id) => live.has(id) || !data.length));
+          data.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+        } else
+          data = await call<Job[]>(
+            "/api/downloads",
+            undefined,
+            controller.signal,
+          );
         if (mounted) setJobs(data);
       } catch {
         if (mounted)
           setNotice(
-            "Cannot reach the local server. Keep Flux running to manage downloads.",
+            remote
+              ? "The download server is not reachable right now."
+              : "Cannot reach the local server. Keep Flux running to manage downloads.",
           );
       } finally {
         refreshing = false;
@@ -154,7 +213,7 @@ export function FluxApp({
       controller.abort();
       document.removeEventListener("visibilitychange", visibilityChanged);
     };
-  }, [hasActiveJobs, publicSite]);
+  }, [hasActiveJobs, publicSite, remote, apiBase]);
   useEffect(() => {
     if (!modal) return;
     const close = (e: KeyboardEvent) => {
@@ -202,11 +261,11 @@ export function FluxApp({
     setError("");
     setVideo(null);
     try {
-      const data = await api<VideoInfo>("/api/inspect", { url });
+      const data = await call<VideoInfo>("/api/inspect", { url });
       setVideo(data);
       setQuality(data.qualities.at(-1)!);
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendly(e));
     } finally {
       setBusy(false);
     }
@@ -216,13 +275,17 @@ export function FluxApp({
     setBusy(true);
     setError("");
     try {
-      const job = await api<Job>("/api/downloads", { url: video.url, quality });
+      const job = await call<Job>("/api/downloads", {
+        url: video.url,
+        quality,
+      });
+      if (remote) writeIds([job.id, ...readIds()]);
       setJobs((old) => [job, ...old]);
       setTab("queue");
       setVideo(null);
       setNotice("Download started. You can save the file when it is ready.");
     } catch (e) {
-      setError((e as Error).message);
+      setError(friendly(e));
     } finally {
       setBusy(false);
     }
@@ -305,7 +368,10 @@ export function FluxApp({
           <div className="local-badge">
             <span className="avatar">Y</span>
             <div>
-              Your local workspace<small>Private by design</small>
+              {remote ? "Your downloads" : "Your local workspace"}
+              <small>
+                {remote ? "Deleted automatically" : "Private by design"}
+              </small>
             </div>
             <ShieldCheck size={17} />
           </div>
@@ -320,7 +386,8 @@ export function FluxApp({
           </div>
           <div className="topbar-right">
             <span className="local-pill">
-              <ShieldCheck size={14} /> Local & private
+              <ShieldCheck size={14} />{" "}
+              {remote ? "Files auto-deleted" : "Local & private"}
             </span>
             <a
               href="https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md"
@@ -351,13 +418,17 @@ export function FluxApp({
                 </p>
                 <div className="hero-badges">
                   <span>
-                    <Check size={14} /> Up to 8K quality
+                    <Check size={14} />{" "}
+                    {remote
+                      ? "1080p here, 8K with the CLI"
+                      : "Up to 8K quality"}
                   </span>
                   <span>
                     <Check size={14} /> No account needed
                   </span>
                   <span>
-                    <Check size={14} /> Your files stay local
+                    <Check size={14} />{" "}
+                    {remote ? "Files auto-deleted" : "Your files stay local"}
                   </span>
                 </div>
               </section>
@@ -406,6 +477,15 @@ export function FluxApp({
                       <ShieldCheck size={15} /> Public videos only. Always
                       respect creators.
                     </span>
+                    {remote && (
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        onClick={buildCommand}
+                      >
+                        <Code2 size={16} /> Use command line
+                      </button>
+                    )}
                     <button
                       className="primary-button"
                       disabled={busy}
@@ -429,7 +509,7 @@ export function FluxApp({
                     {error}
                   </p>
                 )}
-                {publicSite && command && (
+                {command && (
                   <div className="video-result cli-result">
                     <p className="cli-intro">
                       First{" "}
@@ -502,8 +582,10 @@ export function FluxApp({
                       <div>
                         <strong>{video.title}</strong>
                         <p>
-                          {video.creator} · {Math.floor(video.duration / 60)}m{" "}
-                          {Math.round(video.duration % 60)}s · {video.platform}
+                          {video.creator}
+                          {video.duration > 0 &&
+                            ` · ${Math.floor(video.duration / 60)}m ${Math.round(video.duration % 60)}s`}{" "}
+                          · {video.platform}
                         </p>
                       </div>
                     </div>
@@ -564,8 +646,13 @@ export function FluxApp({
                   ))}
                 </div>
                 <p className="platform-footnote">
-                  Also works with Facebook and Dailymotion.{" "}
-                  <span>More moments, fewer tabs.</span>
+                  Also works with{" "}
+                  {platforms
+                    .slice(8)
+                    .map((p) => p.name)
+                    .join(", ")
+                    .replace(/, ([^,]*)$/, " and $1")}
+                  . <span>More moments, fewer tabs.</span>
                 </p>
               </section>
               <section className="features">
@@ -661,7 +748,7 @@ export function FluxApp({
                       {job.status === "complete" && (
                         <a
                           className="save-button"
-                          href={`/api/downloads/${job.id}/file`}
+                          href={`${apiBase}/api/downloads/${job.id}/file`}
                           download
                         >
                           <Download size={16} /> Save file
@@ -703,7 +790,7 @@ export function FluxApp({
             <span>
               Download responsibly. Respect creators.{" "}
               <span className="footer-dot">·</span> <ShieldCheck size={13} />{" "}
-              Local-first MVP
+              {remote ? "Open source" : "Local-first MVP"}
             </span>
           </footer>
         </main>

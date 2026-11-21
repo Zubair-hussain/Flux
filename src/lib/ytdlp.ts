@@ -35,12 +35,14 @@ export function ytdlpCommand(
   };
 }
 
-/** Download flags: no live streams, no age-restricted media, 4 GB cap. */
+/** Download flags: no live streams, no age-restricted media, size cap (4 GB; FLUX_MAX_FILESIZE on a public server). */
 export const downloadSafetyArgs = [
   "--concurrent-fragments",
   "4",
   "--max-filesize",
-  "4G",
+  /^\d+(\.\d+)?[KMG]$/i.test(process.env.FLUX_MAX_FILESIZE || "")
+    ? process.env.FLUX_MAX_FILESIZE!
+    : "4G",
   "--match-filter",
   "!is_live & age_limit<?18",
 ];

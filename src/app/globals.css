@@ -1693,3 +1693,39 @@ footer {
     align-items: stretch;
   }
 }
+.secondary-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #3a3247;
+  background: #17161f;
+  color: #d9cffa;
+  border-radius: 9px;
+  padding: 10px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.secondary-button:hover {
+  border-color: #6d5aa8;
+  background: #1d1a29;
+}
+.secondary-button:focus-visible {
+  outline: 2px solid #ad91ff;
+  outline-offset: 2px;
+}
+.form-bottom .secondary-button {
+  margin-left: auto;
+  margin-right: 10px;
+}
+@media (max-width: 600px) {
+  .form-bottom {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .form-bottom .secondary-button {
+    margin: 0;
+    flex: 1;
+    justify-content: center;
+  }
+}

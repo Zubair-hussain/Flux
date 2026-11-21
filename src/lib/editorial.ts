@@ -19,7 +19,7 @@ export const pages = {
       ],
       [
         "Supported platforms",
-        "Flux recognises links from YouTube, TikTok, Instagram, Reddit, X, LinkedIn, Twitch, Vimeo, Facebook, and Dailymotion. Each platform decides what is reachable without an account, and the same platform can allow one video and block another. Some, such as Reddit and Vimeo, increasingly require sign-in, and Flux deliberately does not import login cookies. When a platform changes its site, updating yt-dlp usually restores support.",
+        "Flux recognises links from YouTube, TikTok, Instagram, Reddit, X, LinkedIn, Twitch, Vimeo, Facebook, Dailymotion, Pinterest, Streamable, and Loom. Each platform decides what is reachable without an account, and the same platform can allow one video and block another. Some, such as Reddit and Vimeo, increasingly require sign-in, and Flux deliberately does not import login cookies. When a platform changes its site, updating yt-dlp usually restores support.",
       ],
       [
         "How a download works",
@@ -50,6 +50,10 @@ export const pages = {
         "Inspecting or downloading a video sends requests to the source platform and its media servers. Those services can receive the server IP address and request information. Configured Blogger integration sends requests from this server to Google.",
       ],
       [
+        "Downloads on this website",
+        "When this website's download box is available, the video link you submit and your IP address are processed to fetch the video and to limit abuse. The finished file is stored temporarily on the server, about one hour by default, and then deleted. We do not keep copies, build profiles, or ask you to sign in. The hosting provider may keep operational logs. If you prefer that nothing passes through a server, use the flux command on your own computer.",
+      ],
+      [
         "Tracking and retention",
         "Advertising is disabled by default. Deployments may enable Google AdSense after configuring consent management; Google can then receive device, network, cookie, and advertising information under its policies and the applicable consent choices. No analytics integration is included. Fonts are served locally. The operator must publish actual provider and retention details before public launch.",
       ],
@@ -67,7 +71,7 @@ export const pages = {
     sections: [
       [
         "Current cookies",
-        "The default configuration does not load advertising or analytics scripts. Interface state is held in browser memory. If the operator enables Google AdSense, Google and its partners may use cookies or local storage for advertising, measurement, and fraud prevention subject to applicable consent requirements. The configured consent provider must offer the appropriate controls.",
+        "The default configuration does not load advertising or analytics scripts. Interface state is held in browser memory. If the website’s download box is available, your browser’s local storage remembers the random IDs of your recent downloads so you can find them again; it holds no personal data and you can clear it in your browser settings. If the operator enables Google AdSense, Google and its partners may use cookies or local storage for advertising, measurement, and fraud prevention subject to applicable consent requirements. The configured consent provider must offer the appropriate controls.",
       ],
       [
         "Third-party destinations",
@@ -96,6 +100,10 @@ export const pages = {
       [
         "Prohibited use",
         "Do not use Flux for sexual content, unlawful material, bypassing DRM, circumventing access controls, or violating another person’s privacy or intellectual property rights.",
+      ],
+      [
+        "Website downloads and limits",
+        "The website's download box is offered as a convenience with limits on video length, file size, resolution, and how many downloads one network can start per hour. Do not try to get around these limits, overload the service, or use it for automated bulk downloading. We may block abusive traffic and refuse any link. For larger or more frequent downloads, run Flux on your own computer.",
       ],
       [
         "Availability and quality",

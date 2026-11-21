@@ -72,6 +72,9 @@ export function enforceContentPolicy(info: Record<string, unknown>) {
     throw new AppError("Sexual content is not allowed.", 403);
   if (!info.title || !Array.isArray(info.formats))
     throw new AppError("The source did not return usable video metadata.", 422);
-  if (Number(info.duration) > 7200)
-    throw new AppError("This MVP supports videos up to two hours.");
+  const maxSeconds = Number(process.env.FLUX_MAX_DURATION || 7200);
+  if (Number(info.duration) > maxSeconds)
+    throw new AppError(
+      `This server supports videos up to ${Math.round(maxSeconds / 60)} minutes. Use the flux command on your own computer for longer videos.`,
+    );
 }

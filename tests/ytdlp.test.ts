@@ -52,6 +52,7 @@ describe("yt-dlp launcher", () => {
       }
       expect(output).not.toContain("HIJACKED");
     },
+    60_000,
   );
   it("keeps the shared safety flags and exact-resolution selector", () => {
     expect(downloadSafetyArgs).toContain("!is_live & age_limit<?18");

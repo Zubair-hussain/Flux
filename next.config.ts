@@ -20,6 +20,14 @@ export function contentSecurityPolicy(env: Env = process.env): string {
     env.ADSENSE_ENABLED === "true" && env.ADSENSE_CONSENT_READY === "true";
   const dev = env.NODE_ENV === "development";
   const adHosts = ads ? ` ${adsenseHosts.join(" ")}` : "";
+  // A separate Flux download server (hosted mode) the website may call.
+  let api = "";
+  try {
+    const base = env.NEXT_PUBLIC_FLUX_API;
+    if (base) api = ` ${new URL(base).origin}`;
+  } catch {
+    /* invalid address: no extra origin is allowed */
+  }
   // Next.js injects inline bootstrap scripts, so 'unsafe-inline' is required
   // without a per-request nonce. Everything else stays first-party.
   return [
@@ -28,7 +36,7 @@ export function contentSecurityPolicy(env: Env = process.env): string {
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob:${ads ? " https:" : ""}`,
     "font-src 'self'",
-    `connect-src 'self'${adHosts}${dev ? " ws: wss:" : ""}`,
+    `connect-src 'self'${api}${adHosts}${dev ? " ws: wss:" : ""}`,
     `frame-src ${ads ? adHosts.trim() : "'none'"}`,
     "media-src 'self' blob:",
     "object-src 'none'",

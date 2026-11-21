@@ -1,22 +1,19 @@
 import { createJob, listJobs } from "@/lib/engine";
-import { failure, guard } from "@/lib/http";
+import { isHosted } from "@/lib/hosted";
+import { handle, preflight } from "@/lib/http";
 export const runtime = "nodejs";
+export const OPTIONS = preflight;
 export async function GET(request: Request) {
-  try {
-    guard(request);
-    return Response.json(await listJobs());
-  } catch (error) {
-    return failure(error);
-  }
+  // A public server must never list other visitors' downloads.
+  return handle(request, undefined, async () =>
+    Response.json(isHosted() ? [] : await listJobs()),
+  );
 }
 export async function POST(request: Request) {
-  try {
-    guard(request);
+  return handle(request, "download", async () => {
     const body = await request.json();
     return Response.json(await createJob(body.url, body.quality), {
       status: 202,
     });
-  } catch (error) {
-    return failure(error);
-  }
+  });
 }

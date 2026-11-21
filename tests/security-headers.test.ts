@@ -41,3 +41,13 @@ it("permits dev tooling only in development", () => {
     "'unsafe-eval'",
   );
 });
+it("allows the website to call a configured download server and nothing else", () => {
+  expect(contentSecurityPolicy({})).toContain("connect-src 'self';");
+  const csp = contentSecurityPolicy({
+    NEXT_PUBLIC_FLUX_API: "https://api.example.org/base/",
+  });
+  expect(csp).toContain("connect-src 'self' https://api.example.org;");
+  expect(
+    contentSecurityPolicy({ NEXT_PUBLIC_FLUX_API: "not a url" }),
+  ).toContain("connect-src 'self';");
+});
