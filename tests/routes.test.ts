@@ -107,11 +107,17 @@ it("returns bounded operator diagnostics for a failed extractor", async () => {
 it("routes inspection, creation, status and files without executing the local engine", async () => {
   vi.stubEnv("FLUX_ROUTER", "true");
   router.proxy.mockImplementation(async () => Response.json({ proxied: true }));
-  await inspect(request({ url: "x" }));
+  await inspect(request({ url: "https://www.tiktok.com/@nasa/video/1" }));
   expect(router.proxy).toHaveBeenLastCalledWith(
     expect.any(Request),
     "/api/inspect",
+    undefined,
+    expect.stringContaining("tiktok.com"),
   );
+  // unsupported links are refused at the router without contacting a backend
+  router.proxy.mockClear();
+  expect((await inspect(request({ url: "x" }))).status).toBe(400);
+  expect(router.proxy).not.toHaveBeenCalled();
   await create(request({ url: "x", quality: 720 }));
   expect(router.proxy).toHaveBeenLastCalledWith(
     expect.any(Request),
