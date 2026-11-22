@@ -26,6 +26,7 @@ import {
   downloadSafetyArgs,
   formatSelector,
   sourceQualities,
+  sourceAccessError,
   ytdlpCommand,
 } from "./ytdlp";
 export { formatResolution } from "./ytdlp";
@@ -73,10 +74,7 @@ async function run(args: string[], timeout = 60000) {
         "FFmpeg is required to merge high-quality video and audio. Install FFmpeg and restart Flux.",
         503,
       );
-    throw new AppError(
-      "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable.",
-      422,
-    );
+    throw sourceAccessError(e.stderr || "");
   }
 }
 async function inspect(input: unknown): Promise<Inspection> {
