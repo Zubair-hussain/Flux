@@ -21,6 +21,7 @@ import { qualityLabel, type Quality } from "./platforms";
 import type { Job, VideoInfo } from "./types";
 import { AsyncCache } from "./async-cache";
 import { limits } from "./hosted";
+import { firebaseEnabled, firebaseJob, publishJob } from "./firebase";
 import {
   downloadSafetyArgs,
   formatSelector,
@@ -37,6 +38,10 @@ const state = globalThis as typeof globalThis & {
   fluxJobListCache?: AsyncCache<ReturnType<typeof publicJob>[]>;
 };
 const active = (state.fluxActive ??= new Set<string>());
+export const backendCapacity = () => ({
+  active: active.size,
+  capacity: limits().maxConcurrent,
+});
 // Internal inspection result: public video info plus format IDs for sources
 // (e.g. LinkedIn) whose resolution is only known from the media URL.
 type Inspection = VideoInfo & { formatIds?: Partial<Record<Quality, string>> };
@@ -127,6 +132,7 @@ async function save(job: Job) {
   await writeFile(temp, JSON.stringify(job), "utf8");
   await rename(temp, jobPath(job.id));
   jobLists.clear();
+  await publishJob(job);
 }
 export async function getJob(id: string): Promise<Job> {
   if (!/^[a-f0-9-]{36}$/.test(id))
@@ -135,7 +141,12 @@ export async function getJob(id: string): Promise<Job> {
   try {
     job = JSON.parse(await readFile(jobPath(id), "utf8"));
   } catch {
-    throw new AppError("Download not found.", 404);
+    throw new AppError(
+      firebaseEnabled()
+        ? "This server no longer has the download. Please download it again."
+        : "Download not found.",
+      firebaseEnabled() ? 410 : 404,
+    );
   }
   if (["queued", "downloading"].includes(job.status) && !active.has(id)) {
     job.status = "failed";
@@ -172,6 +183,7 @@ export async function pruneOldJobs(now = Date.now()) {
       if (!(Date.parse(job.createdAt) < cutoff)) continue;
       await rm(path.join(root, id), { recursive: true, force: true });
       await rm(jobPath(id), { force: true });
+      if (firebaseEnabled()) await firebaseJob(id, "DELETE");
       removed++;
     } catch {
       /* unreadable records are left for manual cleanup */
@@ -288,9 +300,15 @@ export async function downloadFile(id: string) {
   const file = path.resolve(job.file);
   if (!file.startsWith(path.resolve(root, id) + path.sep))
     throw new AppError("Invalid file path.", 403);
+  let size: number;
+  try {
+    size = (await stat(file)).size;
+  } catch {
+    throw new AppError("This file has expired. Please download it again.", 410);
+  }
   return {
     file,
-    size: (await stat(file)).size,
+    size,
     name: `flux-${id.slice(0, 8)}${path.extname(file)}`,
   };
 }
