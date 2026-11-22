@@ -70,6 +70,7 @@ it("signs a valid scoped JWT and reuses its short-lived token", async () => {
     `https://example-default-rtdb.firebaseio.com/flux/jobs/${id}.json`,
   );
   expect(init.headers.Authorization).toBe("Bearer test-token");
+  expect(init.redirect).toBe("manual");
   expect(String(url)).not.toContain("test-token");
 });
 
