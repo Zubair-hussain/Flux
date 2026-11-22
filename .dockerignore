@@ -8,6 +8,8 @@ node_modules
 .tools
 .env*
 !.env.example
+.dev.vars*
+**/*firebase-adminsdk*.json
 downloads
 coverage
 test-results
