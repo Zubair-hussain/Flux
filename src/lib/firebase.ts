@@ -65,6 +65,7 @@ async function accessToken() {
       .sign(account.private_key, "base64url");
     const response = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
+      redirect: "manual",
       body: new URLSearchParams({
         grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
         assertion: `${unsigned}.${signature}`,
@@ -106,7 +107,7 @@ export async function firebaseJob(
       },
       ...(method === "PUT" ? { body: JSON.stringify(value) } : {}),
       cache: "no-store",
-      redirect: "error",
+      redirect: "manual",
       signal: AbortSignal.timeout(10_000),
     });
     if (!response.ok) throw new Error("Database request failed");
