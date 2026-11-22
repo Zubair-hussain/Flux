@@ -19,6 +19,8 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       FLUX_PUBLIC_SITE: "true"
+      FLUX_ROUTER: ${{ vars.FLUX_ROUTER || 'false' }}
+      NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
       SITE_URL: ${{ vars.FLUX_PUBLIC_URL || 'https://flux.detroonshah.workers.dev' }}
       SEO_INDEXABLE: ${{ vars.SEO_INDEXABLE || 'false' }}
     steps:
@@ -45,7 +47,7 @@ jobs:
       - if: steps.creds.outputs.ready == 'true'
         run: npm run cf:build
       - if: steps.creds.outputs.ready == 'true'
-        run: npx wrangler deploy
+        run: npx wrangler deploy --keep-vars --var "FLUX_ROUTER:$FLUX_ROUTER"
       - name: Smoke test the live site
         if: steps.creds.outputs.ready == 'true'
         run: |
