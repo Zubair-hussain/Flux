@@ -1,5 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import { backendCapacity } from "@/lib/engine";
+import { execFile } from "node:child_process";
+import { promisify } from "node:util";
+import { ytdlpCommand } from "@/lib/ytdlp";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -12,8 +15,59 @@ export async function GET(request: Request) {
     secret &&
     Buffer.byteLength(secret) === Buffer.byteLength(supplied) &&
     timingSafeEqual(Buffer.from(secret), Buffer.from(supplied));
+  if (
+    authorized &&
+    new URL(request.url).searchParams.get("diagnostic") === "youtube"
+  ) {
+    // Operator-only, fixed public test video. Never accept executable arguments or URLs.
+    const command = ytdlpCommand([
+      "--skip-download",
+      "--dump-single-json",
+      "--",
+      "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+    ]);
+    try {
+      const result = await promisify(execFile)(command.binary, command.args, {
+        timeout: 60_000,
+        maxBuffer: 12 * 1024 * 1024,
+        windowsHide: true,
+      });
+      const info = JSON.parse(result.stdout);
+      return Response.json(
+        {
+          ok: true,
+          revision: process.env.RENDER_GIT_COMMIT,
+          title: info.title,
+          formats: info.formats?.length,
+        },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    } catch (error) {
+      const detail = error as {
+        code?: string | number;
+        signal?: string;
+        stderr?: string;
+      };
+      return Response.json(
+        {
+          ok: false,
+          revision: process.env.RENDER_GIT_COMMIT,
+          code: detail.code,
+          signal: detail.signal,
+          stderr: String(detail.stderr || "").slice(-4000),
+        },
+        { headers: { "Cache-Control": "no-store" } },
+      );
+    }
+  }
   return Response.json(
-    authorized ? { ok: true, ...backendCapacity() } : { ok: true },
+    authorized
+      ? {
+          ok: true,
+          ...backendCapacity(),
+          revision: process.env.RENDER_GIT_COMMIT,
+        }
+      : { ok: true },
     {
       headers: { "Cache-Control": "no-store" },
     },
