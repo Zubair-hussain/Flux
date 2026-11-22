@@ -1,4 +1,4 @@
-import { beforeEach, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
 const engine = vi.hoisted(() => ({
   inspectVideo: vi.fn(),
   createJob: vi.fn(),
@@ -6,6 +6,12 @@ const engine = vi.hoisted(() => ({
   getJob: vi.fn(),
   publicJob: vi.fn((x: unknown) => x),
   downloadFile: vi.fn(),
+  backendCapacity: vi.fn(() => ({ active: 1, capacity: 3 })),
+}));
+const router = vi.hoisted(() => ({ proxy: vi.fn() }));
+vi.mock("../src/lib/backend-router", () => ({
+  isRouter: () => process.env.FLUX_ROUTER === "true",
+  routeBackend: router.proxy,
 }));
 vi.mock("../src/lib/engine", () => engine);
 vi.mock("node:fs", () => ({
@@ -17,6 +23,7 @@ import { POST as create, GET as list } from "../src/app/api/downloads/route";
 import { GET as get } from "../src/app/api/downloads/[id]/route";
 import { GET as file } from "../src/app/api/downloads/[id]/file/route";
 import { AppError } from "../src/lib/policy";
+import { GET as health } from "../src/app/api/health/route";
 const request = (body?: unknown) =>
   new Request(
     "http://localhost:3000/api",
@@ -24,6 +31,52 @@ const request = (body?: unknown) =>
   );
 const context = { params: Promise.resolve({ id: "abc" }) };
 beforeEach(() => vi.clearAllMocks());
+afterEach(() => vi.unstubAllEnvs());
+
+it("exposes capacity only to an authenticated router", async () => {
+  vi.stubEnv("FLUX_HOSTED", "true");
+  vi.stubEnv("FLUX_ROUTER_SECRET", "health-secret");
+  expect(await (await health(request())).json()).toEqual({ ok: true });
+  expect(
+    await (
+      await health(
+        new Request("https://backend.test/api/health", {
+          headers: { "X-Flux-Router-Secret": "health-secret" },
+        }),
+      )
+    ).json(),
+  ).toEqual({ ok: true, active: 1, capacity: 3 });
+});
+
+it("routes inspection, creation, status and files without executing the local engine", async () => {
+  vi.stubEnv("FLUX_ROUTER", "true");
+  router.proxy.mockImplementation(async () => Response.json({ proxied: true }));
+  await inspect(request({ url: "x" }));
+  expect(router.proxy).toHaveBeenLastCalledWith(
+    expect.any(Request),
+    "/api/inspect",
+  );
+  await create(request({ url: "x", quality: 720 }));
+  expect(router.proxy).toHaveBeenLastCalledWith(
+    expect.any(Request),
+    "/api/downloads",
+  );
+  await get(request(), context);
+  expect(router.proxy).toHaveBeenLastCalledWith(
+    expect.any(Request),
+    "/api/downloads/abc",
+    "abc",
+  );
+  await file(request(), context);
+  expect(router.proxy).toHaveBeenLastCalledWith(
+    expect.any(Request),
+    "/api/downloads/abc/file",
+    "abc",
+  );
+  expect(await (await list(request())).json()).toEqual([]);
+  expect(engine.createJob).not.toHaveBeenCalled();
+  expect(engine.inspectVideo).not.toHaveBeenCalled();
+});
 it("inspects URLs and passes policy failures through", async () => {
   engine.inspectVideo.mockResolvedValue({ title: "A" });
   expect(
