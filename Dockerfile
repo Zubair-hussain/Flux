@@ -8,7 +8,11 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
  && apt-get install -y --no-install-recommends python3 python3-pip ffmpeg ca-certificates curl \
  && rm -rf /var/lib/apt/lists/*
-RUN pip3 install --no-cache-dir --break-system-packages "yt-dlp[default,curl-cffi]"
+# Pin the extractor so Docker cannot silently reuse an older cached release.
+ARG YTDLP_VERSION=2026.10.26
+RUN pip3 install --no-cache-dir --break-system-packages "yt-dlp[default,curl-cffi]==${YTDLP_VERSION}" \
+ && python3 -c "import importlib.metadata as m; print('yt-dlp:', m.version('yt-dlp')); print('EJS:', m.version('yt-dlp-ejs'))" \
+ && node --version
 
 WORKDIR /app
 COPY package.json package-lock.json ./
