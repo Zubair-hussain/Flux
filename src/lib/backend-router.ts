@@ -73,25 +73,38 @@ export async function routeBackend(
             headers: {
               "X-Flux-Router-Secret": process.env.FLUX_ROUTER_SECRET!,
             },
-            redirect: "error",
+            redirect: "manual",
             cache: "no-store",
             signal: AbortSignal.timeout(5_000),
           });
-          if (!response.ok) return null;
+          if (!response.ok) {
+            console.warn("Flux backend health rejected", url, response.status);
+            return null;
+          }
           const health = await response.json();
           if (
             !Number.isInteger(health.active) ||
             !Number.isInteger(health.capacity) ||
             health.active < 0 ||
             health.capacity <= health.active
-          )
+          ) {
+            console.warn("Flux backend capacity unavailable", url, {
+              active: health.active,
+              capacity: health.capacity,
+            });
             return null;
+          }
           return {
             url,
             load: health.active / health.capacity,
             tie: Math.random(),
           };
-        } catch {
+        } catch (error) {
+          console.warn(
+            "Flux backend health request failed",
+            url,
+            error instanceof Error ? error.name : "UnknownError",
+          );
           return null;
         }
       }),
@@ -125,7 +138,7 @@ export async function routeBackend(
       method: request.method,
       headers,
       ...(request.method === "POST" ? { body: await request.text() } : {}),
-      redirect: "error",
+      redirect: "manual",
       cache: "no-store",
       signal: AbortSignal.timeout(
         apiPath.endsWith("/file") ? 30 * 60_000 : 90_000,
@@ -138,6 +151,11 @@ export async function routeBackend(
       503,
     );
   }
+  if (response.status >= 300 && response.status < 400)
+    throw new AppError(
+      "The download server returned an unexpected redirect.",
+      503,
+    );
   const outgoing = new Headers({
     "Cache-Control": "no-store",
     "X-Content-Type-Options": "nosniff",
