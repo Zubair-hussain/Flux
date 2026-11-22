@@ -1,5 +1,8 @@
 # Hosted download server
 
+For a ready-to-configure Render Blueprint, private Firebase job directory, and
+website routing across backends, follow [Firebase and Render setup](FIREBASE-RENDER.md).
+
 Flux normally downloads on the user's own computer. **Hosted mode** adds a second option: a download box on the website that fetches the video through a Flux server. The command-line option stays next to it, so visitors can choose.
 
 Read this first, because hosting downloads is a different business from hosting a website:
