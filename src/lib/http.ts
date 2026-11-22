@@ -1,4 +1,5 @@
 import { AppError } from "./policy";
+import { timingSafeEqual } from "node:crypto";
 import {
   allowedOrigins,
   enforceRateLimit,
@@ -39,6 +40,18 @@ export function originAllowed(request: Request) {
 export function guard(request: Request, kind?: RateKind) {
   const target = new URL(request.url);
   if (isHosted()) {
+    const secret = process.env.FLUX_ROUTER_SECRET;
+    if (secret && process.env.FLUX_ROUTER !== "true") {
+      const supplied = request.headers.get("x-flux-router-secret") || "";
+      if (
+        Buffer.byteLength(secret) !== Buffer.byteLength(supplied) ||
+        !timingSafeEqual(Buffer.from(secret), Buffer.from(supplied))
+      )
+        throw new AppError(
+          "Access this download server through the website.",
+          403,
+        );
+    }
     if (!originAllowed(request))
       throw new AppError("Cross-origin request blocked.", 403);
     if (kind) enforceRateLimit(request, kind);
