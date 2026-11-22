@@ -1,0 +1,17 @@
+node_modules/
+.next/
+.open-next/
+.wrangler/
+.tools/
+.sightline/
+coverage/
+downloads/
+reports/
+test-results/
+playwright-report/
+packages/cli/dist/
+public/downloads/
+.env*
+!.env.example
+.dev.vars*
+**/*firebase-adminsdk*.json
