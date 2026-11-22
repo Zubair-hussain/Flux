@@ -43,7 +43,10 @@ async function api<T>(
       : { cache: "no-store" }),
   });
   const data = await response.json();
-  if (!response.ok) throw new Error(data.error || "Request failed.");
+  if (!response.ok)
+    throw Object.assign(new Error(data.error || "Request failed."), {
+      status: response.status,
+    });
   return data;
 }
 function PlatformIcon({ id, short }: { id: string; short: string }) {
@@ -177,14 +180,15 @@ export function FluxApp({
           data = settled.flatMap((r) =>
             r.status === "fulfilled" ? [r.value] : [],
           );
-          const live = new Set(data.map((j) => j.id));
-          const gone = settled.some(
-            (r, i) =>
-              r.status === "rejected" &&
-              /not found/i.test(String((r.reason as Error).message)) &&
-              !live.has(ids[i]),
+          // Forget only confirmed missing/expired jobs, preserving IDs during outages.
+          const gone = new Set(
+            settled.flatMap((r, i) =>
+              r.status === "rejected" && [404, 410].includes(r.reason?.status)
+                ? [ids[i]]
+                : [],
+            ),
           );
-          if (gone) writeIds(ids.filter((id) => live.has(id) || !data.length));
+          if (gone.size) writeIds(ids.filter((id) => !gone.has(id)));
           data.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         } else
           data = await call<Job[]>(
