@@ -6,9 +6,10 @@ import { describe, expect, it } from "vitest";
 import {
   downloadSafetyArgs,
   formatSelector,
+  proxyArgs,
   safeModuleLauncher,
-  ytdlpCommand,
   sourceAccessError,
+  ytdlpCommand,
 } from "../src/lib/ytdlp";
 
 const hasPython = (() => {
@@ -86,4 +87,58 @@ describe("yt-dlp launcher", () => {
     expect(formatSelector(1080)).toContain("bv[height=1080]");
     expect(formatSelector(720, "7")).toMatch(/\/7$/);
   }, 60_000);
+});
+
+describe("per-platform proxy", () => {
+  const env = {
+    FLUX_PROXY_URL: "http://user:pass@proxy.example:8080",
+    FLUX_PROXY_PLATFORMS: "YouTube, dailymotion",
+  };
+  it("proxies only the platforms listed", () => {
+    expect(proxyArgs("YouTube", env)).toEqual(["--proxy", env.FLUX_PROXY_URL]);
+    expect(proxyArgs("Dailymotion", env)).toEqual([
+      "--proxy",
+      env.FLUX_PROXY_URL,
+    ]);
+    expect(proxyArgs("TikTok", env)).toEqual([]);
+    expect(proxyArgs(undefined, env)).toEqual([]);
+  });
+  it("needs an explicit platform list, and accepts 'all'", () => {
+    expect(
+      proxyArgs("YouTube", { FLUX_PROXY_URL: env.FLUX_PROXY_URL }),
+    ).toEqual([]);
+    expect(
+      proxyArgs("TikTok", { ...env, FLUX_PROXY_PLATFORMS: "all" }),
+    ).toHaveLength(2);
+  });
+  it("ignores unsafe or malformed proxy addresses", () => {
+    for (const bad of [
+      "--exec rm",
+      "file:///etc/passwd",
+      "not a url",
+      "http://a b.example",
+      "ftp://proxy.example",
+    ])
+      expect(proxyArgs("YouTube", { ...env, FLUX_PROXY_URL: bad })).toEqual([]);
+    expect(
+      proxyArgs("YouTube", {
+        ...env,
+        FLUX_PROXY_URL: "socks5h://p.example:1080",
+      }),
+    ).toHaveLength(2);
+  });
+});
+
+describe("source failures", () => {
+  it("tell the page that the visitor's own computer may succeed", () => {
+    for (const stderr of [
+      "[youtube] x: Sign in to confirm you're not a bot",
+      "HTTP Error 429: Too Many Requests",
+      "ERROR: something else",
+    ]) {
+      const error = sourceAccessError(stderr);
+      expect(error.fallback).toBe("cli");
+      expect(error.message).not.toContain(stderr);
+    }
+  });
 });
