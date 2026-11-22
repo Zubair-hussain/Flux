@@ -44,5 +44,6 @@ RUN mkdir -p downloads && chown -R node:node downloads .next
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s \
-  CMD curl -fsS http://127.0.0.1:3000/robots.txt || exit 1
-CMD ["npx", "next", "start", "--hostname", "0.0.0.0", "--port", "3000"]
+  CMD curl -fsS "http://127.0.0.1:${PORT:-3000}/api/health" || exit 1
+# Render supplies PORT at runtime; local Docker runs default to port 3000.
+CMD ["sh", "-c", "exec node node_modules/next/dist/bin/next start --hostname 0.0.0.0 --port \"${PORT:-3000}\""]
