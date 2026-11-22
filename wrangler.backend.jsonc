@@ -1,0 +1,36 @@
+{
+  // Flux download backend: a Worker plus a container built from ./Dockerfile.
+  // Deploy:  npm run cf:backend:deploy   (needs Docker running and the Workers Paid plan)
+  // Secrets: see docs/CLOUDFLARE-BACKEND.md (FLUX_ROUTER_SECRET is required).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "flux-backend",
+  "main": "backend/worker.ts",
+  "compatibility_date": "2026-11-19",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "containers": [
+    {
+      "class_name": "FluxContainer",
+      "image": "./Dockerfile",
+      "image_build_context": ".",
+      // basic = 1/4 vCPU, 1 GiB memory, 4 GB disk. Use "standard-1" (4 GiB) for longer videos.
+      "instance_type": "basic",
+      "max_instances": 2,
+    },
+  ],
+  "durable_objects": {
+    "bindings": [{ "class_name": "FluxContainer", "name": "FLUX_CONTAINER" }],
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["FluxContainer"] }],
+  // Non-secret settings. Must match the other backends' limits.
+  "vars": {
+    "FLUX_BACKEND_ID": "cf-1",
+    "FLUX_MAX_HEIGHT": "720",
+    "FLUX_MAX_DURATION": "300",
+    "FLUX_MAX_FILESIZE": "100M",
+    "FLUX_MAX_CONCURRENT": "1",
+    "FLUX_RETENTION_HOURS": "1",
+  },
+}
