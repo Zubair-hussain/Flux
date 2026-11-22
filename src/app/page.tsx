@@ -53,7 +53,7 @@ const buildJsonLd = (mode: AppMode) => ({
 /** local: own computer · command: website builds a CLI command · remote: website downloads through a Flux server. */
 function appMode(): { mode: AppMode; apiBase: string } {
   const apiBase = (process.env.NEXT_PUBLIC_FLUX_API || "").replace(/\/$/, "");
-  if (process.env.FLUX_HOSTED === "true")
+  if (process.env.FLUX_HOSTED === "true" || process.env.FLUX_ROUTER === "true")
     return { mode: "remote", apiBase: "" };
   if (process.env.FLUX_PUBLIC_SITE === "true")
     return apiBase
