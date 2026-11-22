@@ -9,6 +9,13 @@ const engine = vi.hoisted(() => ({
   backendCapacity: vi.fn(() => ({ active: 1, capacity: 3 })),
 }));
 const router = vi.hoisted(() => ({ proxy: vi.fn() }));
+const diagnostic = vi.hoisted(() => vi.fn());
+vi.mock("node:child_process", async () => {
+  const { promisify } = await import("node:util");
+  return {
+    execFile: Object.assign(() => {}, { [promisify.custom]: diagnostic }),
+  };
+});
 vi.mock("../src/lib/backend-router", () => ({
   isRouter: () => process.env.FLUX_ROUTER === "true",
   routeBackend: router.proxy,
@@ -46,6 +53,55 @@ it("exposes capacity only to an authenticated router", async () => {
       )
     ).json(),
   ).toEqual({ ok: true, active: 1, capacity: 3 });
+});
+
+it("never runs YouTube diagnostics without the backend secret", async () => {
+  vi.stubEnv("FLUX_HOSTED", "true");
+  vi.stubEnv("FLUX_ROUTER_SECRET", "health-secret");
+  expect(
+    await (
+      await health(
+        new Request("https://backend.test/api/health?diagnostic=youtube"),
+      )
+    ).json(),
+  ).toEqual({ ok: true });
+  expect(diagnostic).not.toHaveBeenCalled();
+});
+
+it("restricts authenticated diagnostics to one fixed public video", async () => {
+  vi.stubEnv("FLUX_HOSTED", "true");
+  vi.stubEnv("FLUX_ROUTER_SECRET", "health-secret");
+  diagnostic.mockResolvedValue({
+    stdout: JSON.stringify({ title: "Test", formats: [{}] }),
+  });
+  const response = await health(
+    new Request(
+      "https://backend.test/api/health?diagnostic=youtube&url=https://untrusted.test",
+      {
+        headers: { "X-Flux-Router-Secret": "health-secret" },
+      },
+    ),
+  );
+  expect(await response.json()).toMatchObject({ ok: true, formats: 1 });
+  expect(diagnostic.mock.calls[0][1].at(-1)).toBe(
+    "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  );
+  expect(diagnostic.mock.calls[0][2].timeout).toBe(60_000);
+});
+
+it("returns bounded operator diagnostics for a failed extractor", async () => {
+  vi.stubEnv("FLUX_HOSTED", "true");
+  vi.stubEnv("FLUX_ROUTER_SECRET", "health-secret");
+  diagnostic.mockRejectedValue({ code: 1, stderr: "x".repeat(5000) });
+  const response = await health(
+    new Request("https://backend.test/api/health?diagnostic=youtube", {
+      headers: { "X-Flux-Router-Secret": "health-secret" },
+    }),
+  );
+  const data = await response.json();
+  expect(data.ok).toBe(false);
+  expect(data.stderr).toHaveLength(4000);
+  expect(response.headers.get("cache-control")).toBe("no-store");
 });
 
 it("routes inspection, creation, status and files without executing the local engine", async () => {
