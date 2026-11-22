@@ -3,6 +3,39 @@
 import { qualities, type Quality } from "./platforms";
 import { AppError } from "./policy";
 
+/** Recognize source failures without exposing stderr, URLs, or server paths. */
+export function sourceAccessError(stderr: string) {
+  if (
+    /\[youtube\]/i.test(stderr) &&
+    /confirm you(?:'|’|&#39;|&apos;)?re not a bot|confirm you are not a bot/i.test(
+      stderr,
+    )
+  )
+    return new AppError(
+      "YouTube is refusing requests from this server and requires a sign-in check. Try the Flux command on your own computer. Retrying another quality will not fix this server restriction.",
+      422,
+    );
+  if (/HTTP Error 429|Too Many Requests/i.test(stderr))
+    return new AppError(
+      "The video platform has temporarily rate-limited this server. Please try again later or use Flux on your own computer.",
+      429,
+    );
+  if (
+    /\[youtube\]/i.test(stderr) &&
+    /No supported JavaScript runtime|challenge solving failed|n challenge solving failed|Signature extraction failed|yt-dlp-ejs.*(?:missing|not installed)/i.test(
+      stderr,
+    )
+  )
+    return new AppError(
+      "The server's YouTube extractor needs an update or a working JavaScript challenge solver. Please try again after the server is updated.",
+      503,
+    );
+  return new AppError(
+    "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable.",
+    422,
+  );
+}
+
 export const safeModuleLauncher =
   "import sys,runpy;sys.path[:]=[p for p in sys.path if p not in ('','.')];runpy.run_module('yt_dlp',run_name='__main__',alter_sys=True)";
 
