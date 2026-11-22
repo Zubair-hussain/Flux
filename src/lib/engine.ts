@@ -25,6 +25,7 @@ import { firebaseEnabled, firebaseJob, publishJob } from "./firebase";
 import {
   downloadSafetyArgs,
   formatSelector,
+  proxyArgs,
   sourceQualities,
   sourceAccessError,
   ytdlpCommand,
@@ -53,8 +54,8 @@ const inspections = (state.fluxInspectionCache ??= new AsyncCache<Inspection>(
 const jobLists = (state.fluxJobListCache ??= new AsyncCache<
   ReturnType<typeof publicJob>[]
 >(2_000, 1));
-async function run(args: string[], timeout = 60000) {
-  const command = ytdlpCommand(args);
+async function run(args: string[], timeout = 60000, platform?: string) {
+  const command = ytdlpCommand([...proxyArgs(platform), ...args]);
   try {
     const result = await exec(command.binary, command.args, {
       timeout,
@@ -91,7 +92,11 @@ async function extractVideo(
   platform: string,
 ): Promise<Inspection> {
   const info = JSON.parse(
-    await run(["--dump-single-json", "--skip-download", "--", url]),
+    await run(
+      ["--dump-single-json", "--skip-download", "--", url],
+      60000,
+      platform,
+    ),
   );
   enforceContentPolicy(info);
   const found = sourceQualities(
@@ -269,6 +274,7 @@ async function processJob(job: Job, url: string, labelledFormat?: string) {
           url,
         ],
         30 * 60 * 1000,
+        job.platform,
       );
     try {
       await download(false);
