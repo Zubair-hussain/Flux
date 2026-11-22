@@ -1,6 +1,6 @@
 // yt-dlp rules shared by the web app (engine.ts) and the `flux` CLI, so both
 // enforce the same safety limits and quality selection.
-import { qualities, type Quality } from "./platforms";
+import { platforms, qualities, type Quality } from "./platforms";
 import { AppError } from "./policy";
 
 /** Recognize source failures without exposing stderr, URLs, or server paths. */
@@ -14,11 +14,13 @@ export function sourceAccessError(stderr: string) {
     return new AppError(
       "YouTube is refusing requests from this server and requires a sign-in check. Try the Flux command on your own computer. Retrying another quality will not fix this server restriction.",
       422,
+      "cli",
     );
   if (/HTTP Error 429|Too Many Requests/i.test(stderr))
     return new AppError(
       "The video platform has temporarily rate-limited this server. Please try again later or use Flux on your own computer.",
       429,
+      "cli",
     );
   if (
     /\[youtube\]/i.test(stderr) &&
@@ -29,11 +31,45 @@ export function sourceAccessError(stderr: string) {
     return new AppError(
       "The server's YouTube extractor needs an update or a working JavaScript challenge solver. Please try again after the server is updated.",
       503,
+      "cli",
     );
   return new AppError(
     "The source could not be accessed. It may require sign-in, restrict downloads, or be temporarily unavailable.",
     422,
+    "cli",
   );
+}
+
+const proxySchemes = ["http:", "https:", "socks4:", "socks5:", "socks5h:"];
+/**
+ * Optional proxy for platforms that refuse data-centre addresses.
+ * FLUX_PROXY_URL is the proxy (for example a residential one) and
+ * FLUX_PROXY_PLATFORMS lists the platform IDs that use it ("youtube,dailymotion",
+ * or "all"). Without that list nothing is proxied, so bandwidth costs stay
+ * under control. The address is never logged or shown to visitors.
+ */
+export function proxyArgs(
+  platform: string | undefined,
+  env: Record<string, string | undefined> = process.env,
+): string[] {
+  const raw = env.FLUX_PROXY_URL || "";
+  if (!raw || /\s/.test(raw) || raw.startsWith("-") || !platform) return [];
+  try {
+    if (!proxySchemes.includes(new URL(raw).protocol)) return [];
+  } catch {
+    return [];
+  }
+  const wanted = (env.FLUX_PROXY_PLATFORMS || "")
+    .toLowerCase()
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  const entry = platforms.find((p) => p.name === platform);
+  const used =
+    wanted.includes("all") ||
+    (entry &&
+      (wanted.includes(entry.id) || wanted.includes(entry.name.toLowerCase())));
+  return used ? ["--proxy", raw] : [];
 }
 
 export const safeModuleLauncher =
