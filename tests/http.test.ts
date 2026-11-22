@@ -48,3 +48,13 @@ it("returns controlled errors without exposing internals", async () => {
     error: "An unexpected error occurred. Please retry.",
   });
 });
+
+it("passes the own-computer hint to the page and adds nothing otherwise", async () => {
+  expect(await failure(new AppError("Blocked", 422, "cli")).json()).toEqual({
+    error: "Blocked",
+    fallback: "cli",
+  });
+  expect(await failure(new AppError("Nope", 400)).json()).toEqual({
+    error: "Nope",
+  });
+});
