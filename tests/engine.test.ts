@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import path from "node:path";
 import { readFile } from "node:fs/promises";
+import * as directory from "../src/lib/firebase";
 const mocks = vi.hoisted(() => ({
   run: vi.fn(),
   files: new Map<string, string>(),
@@ -74,6 +75,42 @@ beforeEach(() => {
   }));
 });
 describe("download engine", () => {
+  it("publishes every lifecycle transition without making Firebase mandatory locally", async () => {
+    const statuses: string[] = [];
+    const publish = vi
+      .spyOn(directory, "publishJob")
+      .mockImplementation(async (job) => {
+        statuses.push(job.status);
+      });
+    try {
+      const job = await createJob("https://youtu.be/shared", 1080);
+      await vi.waitFor(() =>
+        expect(statuses).toEqual(["queued", "downloading", "complete"]),
+      );
+      expect((await getJob(job.id)).status).toBe("complete");
+    } finally {
+      publish.mockRestore();
+    }
+  });
+
+  it("does not start a download when publishing its initial ownership fails", async () => {
+    const publish = vi
+      .spyOn(directory, "publishJob")
+      .mockRejectedValueOnce(new Error("directory unavailable"));
+    try {
+      await expect(
+        createJob("https://youtu.be/unavailable", 1080),
+      ).rejects.toThrow("directory unavailable");
+      expect(
+        mocks.run.mock.calls.every(([, args]) =>
+          args.includes("--dump-single-json"),
+        ),
+      ).toBe(true);
+    } finally {
+      publish.mockRestore();
+    }
+  });
+
   it("reuses job list reads and invalidates them when a job changes", async () => {
     const first = await createJob("https://youtu.be/abc", 1080);
     await vi.waitFor(async () =>
