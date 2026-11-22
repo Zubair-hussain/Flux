@@ -292,6 +292,19 @@ describe("download engine", () => {
     expect(selectors[0]).toMatch(/^bv\[height=1080\]/);
     expect(selectors[1]).toMatch(/^b\[height=1080\]/);
   });
+  it("sends only the configured platforms through the proxy", async () => {
+    vi.stubEnv("FLUX_PROXY_URL", "http://proxy.example:8080");
+    vi.stubEnv("FLUX_PROXY_PLATFORMS", "youtube");
+    await inspectVideo("https://www.youtube.com/watch?v=proxied");
+    await inspectVideo("https://www.tiktok.com/@a/video/1");
+    const [youtube, tiktok] = mocks.run.mock.calls.map(([, args]) => args);
+    expect(youtube).toContain("--proxy");
+    expect(youtube[youtube.indexOf("--proxy") + 1]).toBe(
+      "http://proxy.example:8080",
+    );
+    expect(tiktok).not.toContain("--proxy");
+    vi.unstubAllEnvs();
+  });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];
     const job = await createJob("https://youtu.be/abc", 1080);
