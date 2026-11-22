@@ -64,6 +64,8 @@ export async function routeBackend(
   request: Request,
   apiPath: string,
   id?: string,
+  /** Body already read by the caller (it can only be read once). */
+  bodyText?: string,
 ) {
   const configured = backends();
   let candidates: string[];
@@ -149,7 +151,10 @@ export async function routeBackend(
         503,
       );
   }
-  const body = request.method === "POST" ? await request.text() : undefined;
+  const body =
+    request.method === "POST"
+      ? (bodyText ?? (await request.text()))
+      : undefined;
   // Only requests that start new work can move to another server; a file
   // belongs to the server that holds it.
   const canFailOver = !id && request.method === "POST";
