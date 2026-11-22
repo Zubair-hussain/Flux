@@ -2,7 +2,8 @@
 // a user's own computer. Everything here is off unless that flag is set.
 import { AppError } from "./policy";
 
-export const isHosted = () => process.env.FLUX_HOSTED === "true";
+export const isHosted = () =>
+  process.env.FLUX_HOSTED === "true" || process.env.FLUX_ROUTER === "true";
 
 /** Websites allowed to call the API from a browser, besides the server's own origin. */
 export function allowedOrigins(env = process.env): string[] {
