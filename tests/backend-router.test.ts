@@ -187,3 +187,115 @@ it("blocks direct backend access while allowing authenticated router requests", 
     ),
   ).not.toThrow();
 });
+
+const healthy = (loads: Record<string, number>) => (url: string) => {
+  const host = new URL(url).hostname;
+  return Response.json({ active: loads[host] ?? 0, capacity: 2 });
+};
+const answers = (
+  responses: Record<string, () => Response | Promise<Response>>,
+  loads: Record<string, number> = {},
+) =>
+  fetcher.mockImplementation(async (url) => {
+    if (String(url).endsWith("/api/health")) return healthy(loads)(String(url));
+    return responses[new URL(String(url)).hostname]();
+  });
+const refusal = (status = 422, error = "YouTube is refusing requests") =>
+  Response.json({ error }, { status });
+const posts = () =>
+  fetcher.mock.calls
+    .filter(([, init]) => init?.method === "POST")
+    .map(([url]) => new URL(String(url)).hostname);
+
+it("tries the next server when the first one is refused by the platform", async () => {
+  // "one" is asked first because it is the least loaded
+  answers(
+    {
+      "one.test": () => refusal(),
+      "two.test": () => Response.json({ id }, { status: 202 }),
+    },
+    { "one.test": 0, "two.test": 1 },
+  );
+  const result = await routeBackend(request(), "/api/downloads");
+  expect(result.status).toBe(202);
+  expect(posts()).toEqual(["one.test", "two.test"]);
+});
+
+it("returns the first explanation when every server is refused", async () => {
+  answers({
+    "one.test": () => refusal(422, "first answer"),
+    "two.test": () => refusal(429, "second answer"),
+  });
+  const result = await routeBackend(request(), "/api/downloads");
+  expect([422, 429]).toContain(result.status);
+  const message = (await result.json()).error;
+  expect(["first answer", "second answer"]).toContain(message);
+  expect(posts()).toHaveLength(2);
+});
+
+it("asks fallback servers only after the primary ones", async () => {
+  vi.stubEnv(
+    "FLUX_BACKENDS",
+    JSON.stringify({
+      cloud: "https://cloud.test",
+      home: { url: "https://home.test", fallback: true },
+    }),
+  );
+  // the home server is idle and the cloud one is busy, yet cloud goes first
+  answers(
+    {
+      "cloud.test": () => refusal(),
+      "home.test": () => Response.json({ id }, { status: 202 }),
+    },
+    { "cloud.test": 1, "home.test": 0 },
+  );
+  const result = await routeBackend(request(), "/api/downloads");
+  expect(result.status).toBe(202);
+  expect(posts()).toEqual(["cloud.test", "home.test"]);
+});
+
+it("does not fail over for errors the visitor caused or for a file that lives on one server", async () => {
+  answers({
+    "one.test": () => refusal(400, "bad request"),
+    "two.test": () => refusal(400, "bad request"),
+  });
+  expect((await routeBackend(request(), "/api/downloads")).status).toBe(400);
+  expect(posts()).toHaveLength(1);
+  fetcher.mockClear();
+  answers({
+    "one.test": () => refusal(422),
+    "two.test": () => refusal(422),
+  });
+  const file = new Request(`https://website.test/api/downloads/${id}/file`);
+  expect(
+    (await routeBackend(file, `/api/downloads/${id}/file`, id)).status,
+  ).toBe(422);
+  expect(
+    fetcher.mock.calls.filter(([url]) => !String(url).endsWith("/api/health")),
+  ).toHaveLength(1);
+});
+
+it("keeps the clear refusal when the next server cannot be reached", async () => {
+  answers(
+    {
+      "one.test": () => refusal(422, "platform blocked this server"),
+      "two.test": () => {
+        throw new Error("down");
+      },
+    },
+    { "one.test": 0, "two.test": 1 },
+  );
+  const result = await routeBackend(request(), "/api/downloads");
+  expect(result.status).toBe(422);
+  expect((await result.json()).error).toBe("platform blocked this server");
+});
+
+it("rejects a malformed fallback definition", async () => {
+  vi.stubEnv(
+    "FLUX_BACKENDS",
+    JSON.stringify({ home: { url: "http://home.test", fallback: true } }),
+  );
+  await expect(routeBackend(request(), "/api/downloads")).rejects.toMatchObject(
+    { status: 503 },
+  );
+});
