@@ -15,16 +15,14 @@ beforeEach(() => {
   shared.job
     .mockReset()
     .mockResolvedValue({ backendId: "two", expiresAt: Date.now() + 60_000 });
-  fetcher
-    .mockReset()
-    .mockImplementation(async (url) =>
-      String(url).endsWith("/api/health")
-        ? Response.json({
-            active: String(url).includes("one") ? 1 : 0,
-            capacity: 2,
-          })
-        : Response.json({ id }, { status: 202 }),
-    );
+  fetcher.mockReset().mockImplementation(async (url) =>
+    String(url).endsWith("/api/health")
+      ? Response.json({
+          active: String(url).includes("one") ? 1 : 0,
+          capacity: 2,
+        })
+      : Response.json({ id }, { status: 202 }),
+  );
   vi.stubGlobal("fetch", fetcher);
 });
 afterEach(() => {
@@ -49,9 +47,27 @@ it("selects the least loaded server and forwards trusted credentials and the bod
   expect(fetcher.mock.calls[2][0]).toBe("https://two.test/api/downloads");
   const init = fetcher.mock.calls[2][1];
   expect(init.headers.get("X-Flux-Router-Secret")).toBe("secret-value");
+  expect(init.redirect).toBe("manual");
   expect(init.headers.get("CF-Connecting-IP")).toBe("203.0.113.1");
   expect(JSON.parse(init.body)).toMatchObject({ quality: 720 });
   expect(result.headers.get("cache-control")).toBe("no-store");
+});
+
+it("rejects upstream redirects without replaying credentials", async () => {
+  fetcher.mockImplementation(async (url) =>
+    String(url).endsWith("/api/health")
+      ? Response.json({ active: 0, capacity: 1 })
+      : new Response(null, {
+          status: 302,
+          headers: { Location: "https://untrusted.test" },
+        }),
+  );
+  await expect(routeBackend(request(), "/api/downloads")).rejects.toMatchObject(
+    { status: 503 },
+  );
+  expect(
+    fetcher.mock.calls.some(([url]) => String(url).includes("untrusted")),
+  ).toBe(false);
 });
 
 it("routes an existing file straight to its owner and streams its response", async () => {
