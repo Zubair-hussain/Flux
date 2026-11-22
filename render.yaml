@@ -1,0 +1,35 @@
+# Render Dashboard -> New -> Blueprint -> select this repository.
+# Creates ONE backend. Add legitimately provisioned services to FLUX_BACKENDS.
+services:
+  - type: web
+    name: flux-backend
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    autoDeployTrigger: commit
+    envVars:
+      - key: FLUX_HOSTED
+        value: "true"
+      - key: FLUX_BACKEND_ID
+        value: backend-1
+      - key: FIREBASE_DATABASE_URL
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      # Use the SAME random secret on the router and every backend.
+      - key: FLUX_ROUTER_SECRET
+        sync: false
+      - key: FLUX_MAX_HEIGHT
+        value: "720"
+      - key: FLUX_MAX_DURATION
+        value: "300"
+      - key: FLUX_MAX_FILESIZE
+        value: 100M
+      - key: FLUX_MAX_CONCURRENT
+        value: "1"
+      - key: FLUX_RETENTION_HOURS
+        value: "1"
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
