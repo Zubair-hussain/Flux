@@ -8,6 +8,7 @@ import {
   formatSelector,
   safeModuleLauncher,
   ytdlpCommand,
+  sourceAccessError,
 } from "../src/lib/ytdlp";
 
 const hasPython = (() => {
@@ -18,6 +19,32 @@ const hasPython = (() => {
     return false;
   }
 })();
+
+describe("source access errors", () => {
+  it("distinguishes YouTube server restrictions from extractor failures", () => {
+    expect(
+      sourceAccessError(
+        "ERROR: [youtube] abc: Sign in to confirm you’re not a bot.",
+      ).message,
+    ).toContain("YouTube is refusing requests");
+    expect(
+      sourceAccessError("ERROR: [youtube] abc: Signature extraction failed")
+        .status,
+    ).toBe(503);
+    expect(
+      sourceAccessError("ERROR: HTTP Error 429: Too Many Requests").status,
+    ).toBe(429);
+  });
+  it("keeps raw source output private and does not infer a YouTube block from another platform", () => {
+    const raw =
+      "ERROR: [other] private-title https://private.test/video /srv/downloads/key";
+    expect(sourceAccessError(raw).message).not.toContain("private");
+    expect(
+      sourceAccessError("[other] Sign in to confirm you’re not a bot").message,
+    ).not.toContain("YouTube");
+    expect(sourceAccessError("").status).toBe(422);
+  });
+});
 
 describe("yt-dlp launcher", () => {
   it("loads yt-dlp without trusting the current folder", () => {
