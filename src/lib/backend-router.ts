@@ -4,7 +4,15 @@ import { clientIp } from "./hosted";
 
 export const isRouter = () => process.env.FLUX_ROUTER === "true";
 
-function backends(): Record<string, string> {
+type Backend = { url: string; fallback: boolean };
+
+/**
+ * FLUX_BACKENDS maps a backend ID to its HTTPS address, or to
+ * { "url": "...", "fallback": true } for a server that should only be asked
+ * after the others refuse (for example a home connection that platforms
+ * trust more than a data centre).
+ */
+function backends(): Record<string, Backend> {
   try {
     const values = JSON.parse(process.env.FLUX_BACKENDS || "{}");
     if (
@@ -14,11 +22,16 @@ function backends(): Record<string, string> {
       !Object.keys(values).length
     )
       throw new Error();
+    const parsed: Record<string, Backend> = {};
     for (const [id, value] of Object.entries(values)) {
-      const url = new URL(String(value));
+      const detail =
+        value && typeof value === "object" && !Array.isArray(value)
+          ? (value as { url?: unknown; fallback?: unknown })
+          : { url: value, fallback: false };
+      if (typeof detail.url !== "string") throw new Error();
+      const url = new URL(detail.url);
       if (
         !/^[a-zA-Z0-9_-]{1,64}$/.test(id) ||
-        typeof value !== "string" ||
         url.protocol !== "https:" ||
         url.username ||
         url.password ||
@@ -28,13 +41,22 @@ function backends(): Record<string, string> {
         url.hash
       )
         throw new Error();
-      values[id] = url.origin;
+      parsed[id] = { url: url.origin, fallback: detail.fallback === true };
     }
     if (!process.env.FLUX_ROUTER_SECRET) throw new Error();
-    return values;
+    return parsed;
   } catch {
     throw new AppError("The download router is not configured.", 503);
   }
+}
+
+/** A backend's explicit "no" (blocked, busy, source refused): safe to ask the next one. */
+function isRefusal(response: Response) {
+  if (response.status === 422 || response.status === 429) return true;
+  return (
+    response.status === 503 &&
+    (response.headers.get("content-type") || "").includes("application/json")
+  );
 }
 
 /** On-demand selection only: no background keep-alive requests. */
@@ -44,7 +66,7 @@ export async function routeBackend(
   id?: string,
 ) {
   const configured = backends();
-  let base: string;
+  let candidates: string[];
   if (id) {
     const record = await firebaseJob(id);
     if (!record) throw new AppError("Download not found.", 404);
@@ -60,14 +82,15 @@ export async function routeBackend(
         410,
       );
     }
-    base = Object.hasOwn(configured, record.backendId)
-      ? configured[record.backendId]
+    const owner = Object.hasOwn(configured, record.backendId)
+      ? configured[record.backendId].url
       : "";
-    if (!base)
+    if (!owner)
       throw new AppError("This download's server is unavailable.", 503);
+    candidates = [owner];
   } else {
     const available = await Promise.all(
-      Object.values(configured).map(async (url) => {
+      Object.values(configured).map(async ({ url, fallback }) => {
         try {
           const response = await fetch(`${url}/api/health`, {
             headers: {
@@ -96,6 +119,7 @@ export async function routeBackend(
           }
           return {
             url,
+            fallback,
             load: health.active / health.capacity,
             tie: Math.random(),
           };
@@ -109,16 +133,53 @@ export async function routeBackend(
         }
       }),
     );
-    const chosen = available
+    // Primary servers first (least loaded first), fallback servers after them.
+    candidates = available
       .filter((item) => item !== null)
-      .sort((a, b) => a.load - b.load || a.tie - b.tie)[0];
-    if (!chosen)
+      .sort(
+        (a, b) =>
+          Number(a.fallback) - Number(b.fallback) ||
+          a.load - b.load ||
+          a.tie - b.tie,
+      )
+      .map((item) => item.url);
+    if (!candidates.length)
       throw new AppError(
         "Download servers are busy or starting up. Please retry shortly.",
         503,
       );
-    base = chosen.url;
   }
+  const body = request.method === "POST" ? await request.text() : undefined;
+  // Only requests that start new work can move to another server; a file
+  // belongs to the server that holds it.
+  const canFailOver = !id && request.method === "POST";
+  let firstRefusal: Response | undefined;
+  for (let index = 0; index < candidates.length; index++) {
+    let response: Response;
+    try {
+      response = await forward(request, candidates[index], apiPath, body);
+    } catch (error) {
+      // An earlier server gave a clear answer; that beats "could not be reached".
+      if (firstRefusal) return firstRefusal;
+      throw error;
+    }
+    const last = index === candidates.length - 1;
+    if (!canFailOver || last || !isRefusal(response)) return response;
+    // Keep the first explanation in case no server can do it.
+    firstRefusal ??= new Response(await response.text(), {
+      status: response.status,
+      headers: response.headers,
+    });
+  }
+  return firstRefusal!;
+}
+
+async function forward(
+  request: Request,
+  base: string,
+  apiPath: string,
+  body: string | undefined,
+) {
   if (base === new URL(request.url).origin)
     throw new AppError(
       "The download router cannot forward requests to itself.",
@@ -137,7 +198,7 @@ export async function routeBackend(
     response = await fetch(`${base}${apiPath}`, {
       method: request.method,
       headers,
-      ...(request.method === "POST" ? { body: await request.text() } : {}),
+      ...(body !== undefined ? { body } : {}),
       redirect: "manual",
       cache: "no-store",
       signal: AbortSignal.timeout(
