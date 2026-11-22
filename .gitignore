@@ -21,3 +21,6 @@ packages/cli/LEGAL.md
 .open-next/
 .wrangler/
 .dev.vars
+.dev.vars.*
+# Downloaded Firebase service-account credentials must remain private.
+*firebase-adminsdk*.json
