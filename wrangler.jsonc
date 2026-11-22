@@ -15,6 +15,7 @@
   // Static pages read the same variables at build time: see cf-deploy.yml.
   "vars": {
     "FLUX_PUBLIC_SITE": "true",
+    "FLUX_ROUTER": "true",
     "FLUX_BACKENDS": "{\"backend-1\":\"https://flux-qxb8.onrender.com\",\"backend-2\":\"https://flux-l5qr.onrender.com\"}",
     "SITE_URL": "https://flux.detroonshah.workers.dev",
     // Keep false until a custom domain is attached (avoids indexing workers.dev).
