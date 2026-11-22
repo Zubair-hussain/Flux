@@ -4,6 +4,8 @@ export class AppError extends Error {
   constructor(
     message: string,
     public status = 400,
+    /** "cli": the visitor's own computer may succeed where this server cannot. */
+    public fallback?: "cli",
   ) {
     super(message);
   }
