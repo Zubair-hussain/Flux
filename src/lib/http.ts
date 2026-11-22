@@ -69,6 +69,9 @@ export function failure(error: unknown) {
         error instanceof AppError
           ? error.message
           : "An unexpected error occurred. Please retry.",
+      ...(error instanceof AppError && error.fallback
+        ? { fallback: error.fallback }
+        : {}),
     },
     { status: error instanceof AppError ? error.status : 500 },
   );
