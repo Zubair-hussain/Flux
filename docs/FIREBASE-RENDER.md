@@ -94,7 +94,9 @@ router secret, and download limits. Add its ID and HTTPS origin to `FLUX_BACKEND
 The router probes capacity only when an inspection or new download arrives, picks
 the least loaded responsive backend, and uses Firebase to send all later status
 and file requests to the job's owner. There are no scheduled keep-alive pings or
-Firebase polling connections. A server at capacity rejects extra work; this is
+Firebase polling connections. If a backend refuses new work (a platform blocks it, or it is busy), the router
+asks the next healthy backend; a backend marked `{"url": "...", "fallback": true}`
+is asked only after the others. See [PLATFORM-BLOCKS.md](PLATFORM-BLOCKS.md). A server at capacity rejects extra work; this is
 not a durable queue. An ambiguous failed download POST is never automatically
 replayed, to avoid starting duplicate downloads.
 
