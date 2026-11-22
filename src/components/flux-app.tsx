@@ -46,6 +46,7 @@ async function api<T>(
   if (!response.ok)
     throw Object.assign(new Error(data.error || "Request failed."), {
       status: response.status,
+      fallback: data.fallback as string | undefined,
     });
   return data;
 }
@@ -231,8 +232,8 @@ export function FluxApp({
     window.addEventListener("keydown", close);
     return () => window.removeEventListener("keydown", close);
   }, [modal]);
-  function buildCommand() {
-    setError("");
+  function buildCommand(keepError = false) {
+    if (!keepError) setError("");
     setCommand("");
     let link: URL;
     try {
@@ -263,11 +264,18 @@ export function FluxApp({
       setNotice("Select the command and copy it manually.");
     }
   }
+  /** When the server cannot fetch a video, show the command for the visitor's own computer. */
+  function offerCommand(e: unknown) {
+    if (!remote || (e as { fallback?: string }).fallback !== "cli") return "";
+    queueMicrotask(() => buildCommand(true));
+    return " The command for your own computer is ready below.";
+  }
   async function inspect(event: React.FormEvent) {
     event.preventDefault();
     if (publicSite) return buildCommand();
     setBusy(true);
     setError("");
+    setCommand("");
     setVideo(null);
     try {
       const turnstileToken = await human.getToken();
@@ -278,7 +286,7 @@ export function FluxApp({
       setVideo(data);
       setQuality(data.qualities.at(-1)!);
     } catch (e) {
-      setError(friendly(e));
+      setError(friendly(e) + offerCommand(e));
     } finally {
       setBusy(false);
     }
@@ -300,7 +308,7 @@ export function FluxApp({
       setVideo(null);
       setNotice("Download started. You can save the file when it is ready.");
     } catch (e) {
-      setError(friendly(e));
+      setError(friendly(e) + offerCommand(e));
     } finally {
       setBusy(false);
     }
@@ -496,7 +504,7 @@ export function FluxApp({
                       <button
                         className="secondary-button"
                         type="button"
-                        onClick={buildCommand}
+                        onClick={() => buildCommand()}
                       >
                         <Code2 size={16} /> Use command line
                       </button>
