@@ -26,6 +26,7 @@ import {
   downloadSafetyArgs,
   formatSelector,
   proxyArgs,
+  directLinks,
   sourceQualities,
   sourceAccessError,
   ytdlpCommand,
@@ -110,6 +111,13 @@ async function extractVideo(
       `This server offers up to ${qualityLabel(maxHeight)}, but this video starts higher. Use the flux command on your own computer.`,
       422,
     );
+  // Plain file links cost the server nothing, so they are offered for the
+  // qualities the visitor can pick (never above this server's own cap).
+  const direct = Object.fromEntries(
+    Object.entries(
+      directLinks(Array.isArray(info.formats) ? info.formats : [], platform),
+    ).filter(([quality]) => available.includes(Number(quality) as Quality)),
+  );
   let thumbnail: string | undefined;
   try {
     const u = new URL(info.thumbnail);
@@ -125,6 +133,7 @@ async function extractVideo(
     duration: Number(info.duration) || 0,
     thumbnail,
     qualities: available,
+    ...(Object.keys(direct).length ? { direct } : {}),
     ...(Object.keys(formatIds).length ? { formatIds } : {}),
   };
 }
