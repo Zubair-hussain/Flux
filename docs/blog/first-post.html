@@ -1,0 +1,41 @@
+<!--
+  FIRST BLOG POST for Blogger. How to publish it:
+  1. Blogger, New post. Click the pen/eye icon and choose "HTML view".
+  2. Paste everything below the "PASTE FROM HERE" line.
+  3. Title:               Why a 4K video isn't always 4K: how Flux finds the real quality
+  4. Labels:              video quality, downloads, guides
+  5. Post settings, Search description (150 characters):
+     What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.
+  6. Publish. It appears on the website's Blog page and in /llms.txt within about 5 minutes.
+-->
+<!-- PASTE FROM HERE -->
+<p>When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice, the numbers can mislead. This guide explains how <a href="https://flux.detroonshah.workers.dev/">Flux</a> decides what to offer, using results from our own tests in November 2026.</p>
+
+<h2>Flux only offers what the source really has</h2>
+<p>Flux reads the list of versions that a platform actually provides and shows only those, from 720p up to 8K. It never creates a higher resolution by stretching a smaller picture. A 720p upload stays a 720p download, because upscaling adds file size but no detail.</p>
+
+<h2>Vertical videos count by their short side</h2>
+<p>Phone videos are tall, not wide. A TikTok clip we tested measured 720&times;1280. The shorter side is 720, so Flux calls it a <strong>720p</strong> source. Judging by the long side would label it "1280p", which exists on no quality menu and would promise detail the video does not have.</p>
+
+<h2>What different platforms offered in our tests</h2>
+<ul>
+  <li><strong>Dailymotion</strong> sample: versions up to 4K.</li>
+  <li><strong>Pinterest</strong> sample: up to 1080p.</li>
+  <li><strong>TikTok</strong> sample: 720p and 1080p.</li>
+  <li><strong>Instagram, Streamable and Loom</strong> samples: 720p only.</li>
+</ul>
+<p>These are single samples, not guarantees. Each uploader chooses how much quality to publish, and platforms change often.</p>
+
+<h2>Why 4K files are so much bigger</h2>
+<p>In the same Dailymotion test, the 1080p version was about 61 MB and the 4K version about 216 MB, roughly 3.5 times larger. On a phone or a laptop screen the difference is hard to see, so 1080p is usually the better choice. Pick 4K when you will watch on a large screen or edit and crop the footage.</p>
+
+<h2>Why some files are MKV</h2>
+<p>At higher quality, many platforms deliver the picture and the sound as separate files. Flux joins them with FFmpeg into one file. When the two parts use different codecs, MKV can hold them together without re-encoding, so nothing is lost. VLC, mpv and most modern players open MKV directly.</p>
+
+<h2>Download only what you may keep</h2>
+<p>A public video is not automatically free to reuse. Save videos you own, that you have permission to keep, or that are licensed for it, and follow each platform's terms. Flux does not bypass DRM, sign-in or paywalls, and it blocks live streams, playlists and age-restricted or sexual content. Read the <a href="https://flux.detroonshah.workers.dev/content-policy">content policy</a> for details.</p>
+
+<h2>Try it</h2>
+<p>Paste a public video link into Flux, check which qualities the source offers, and choose the one that fits. If a link cannot be fetched from our server, Flux shows a command you can run on your own computer instead. The source code is open on <a href="https://github.com/Zubair-hussain/Flux">GitHub</a>.</p>
+
+<p><em>Flux is made by <a href="https://zubairhussain.xyz">Zubair Hussain (zubairhussain.xyz)</a>.</em></p>
