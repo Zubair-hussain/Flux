@@ -1,9 +1,10 @@
-import { afterEach, expect, it, vi } from "vitest";
-import { bloggerPosts } from "../src/lib/blogger";
+import { afterEach, beforeEach, expect, it, vi } from "vitest";
+import { bloggerPosts, clearBloggerCache } from "../src/lib/blogger";
 import { pageMetadata, publicReady } from "../src/lib/site";
 import { pages } from "../src/lib/editorial";
 import robots from "../src/app/robots";
 import sitemap from "../src/app/sitemap";
+beforeEach(() => clearBloggerCache());
 afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
