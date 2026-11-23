@@ -631,14 +631,44 @@ export function FluxApp({
                           ))}
                         </select>
                       </label>
-                      <button
-                        className="primary-button"
-                        onClick={download}
-                        disabled={busy}
-                      >
-                        <Download size={17} /> Download {qualityLabel(quality)}
-                      </button>
+                      {remote && video.direct?.[quality] ? (
+                        <a
+                          className="primary-button"
+                          href={video.direct[quality]}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          referrerPolicy="no-referrer"
+                        >
+                          <Download size={17} /> Download{" "}
+                          {qualityLabel(quality)}
+                        </a>
+                      ) : (
+                        <button
+                          className="primary-button"
+                          onClick={download}
+                          disabled={busy}
+                        >
+                          <Download size={17} /> Download{" "}
+                          {qualityLabel(quality)}
+                        </button>
+                      )}
                     </div>
+                    {remote && video.direct?.[quality] && (
+                      <p className="direct-hint">
+                        The video opens in a new tab. Click the <b>⋮</b> menu
+                        (or right-click it) and choose <b>Download</b>. Link not
+                        working?{" "}
+                        <button
+                          type="button"
+                          className="text-button"
+                          onClick={download}
+                          disabled={busy}
+                        >
+                          Download from our server instead
+                        </button>
+                        .
+                      </p>
+                    )}
                   </div>
                 )}
               </section>
