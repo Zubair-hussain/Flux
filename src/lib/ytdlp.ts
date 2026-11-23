@@ -138,9 +138,15 @@ type Format = {
   width?: number;
   height?: number;
   vcodec?: string;
+  acodec?: string;
   has_drm?: boolean;
   url?: string;
   format_note?: string;
+  protocol?: string;
+  ext?: string;
+  tbr?: number;
+  fragments?: unknown[];
+  http_headers?: Record<string, string>;
 };
 
 /** Source qualities (720p–8K) excluding DRM and audio-only formats. */
@@ -165,6 +171,69 @@ export function sourceQualities(formats: Format[]) {
       422,
     );
   return { qualities: available, formatIds };
+}
+
+/**
+ * Video servers each platform's own files may be opened from. A direct link is
+ * only offered for these, so the page can never point visitors somewhere else.
+ */
+const directHosts: Record<string, string[]> = {
+  "X / Twitter": ["twimg.com"],
+  LinkedIn: ["licdn.com"],
+  Streamable: ["streamable.com"],
+  Pinterest: ["pinimg.com"],
+  Twitch: ["twitch.tv", "twitchcdn.net", "cloudfront.net"],
+};
+const videoFiles = ["mp4", "mov", "m4v", "webm"];
+
+/**
+ * Plain video-file links (video and audio together, no streaming pieces, no
+ * cookies) a visitor's browser can open and save. They come straight from the
+ * platform, so they cost the server no bandwidth. One link per quality.
+ */
+export function directLinks(
+  formats: Format[],
+  platform: string,
+): Partial<Record<Quality, string>> {
+  const hosts = directHosts[platform];
+  if (!hosts) return {};
+  const best: Partial<Record<Quality, { url: string; tbr: number }>> = {};
+  for (const f of formats) {
+    if (
+      !f.url ||
+      f.url.length > 4000 ||
+      !["https", "http"].includes(f.protocol || "") ||
+      f.fragments?.length ||
+      f.has_drm ||
+      f.vcodec === "none" ||
+      f.acodec === "none" ||
+      (f.ext && !videoFiles.includes(f.ext)) ||
+      Object.keys(f.http_headers || {}).some((k) => /^cookie$/i.test(k))
+    )
+      continue;
+    let url: URL;
+    try {
+      url = new URL(f.url);
+    } catch {
+      continue;
+    }
+    if (
+      url.protocol !== "https:" ||
+      url.username ||
+      url.password ||
+      !hosts.some((h) => url.hostname === h || url.hostname.endsWith(`.${h}`))
+    )
+      continue;
+    const { value } = formatResolution(f);
+    if (!qualities.includes(value as Quality)) continue;
+    const quality = value as Quality;
+    const tbr = f.tbr || 0;
+    if (!best[quality] || tbr > best[quality]!.tbr)
+      best[quality] = { url: url.href, tbr };
+  }
+  return Object.fromEntries(
+    Object.entries(best).map(([quality, item]) => [quality, item!.url]),
+  );
 }
 
 /**
