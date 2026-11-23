@@ -1,7 +1,7 @@
 import { FluxApp, type AppMode } from "@/components/flux-app";
 import { HomeGuide, faqFor } from "@/components/home-guide";
 import { AdSlot } from "@/components/adsense";
-import { siteUrl } from "@/lib/site";
+import { creator, repositoryUrl, siteUrl } from "@/lib/site";
 import { platforms } from "@/lib/platforms";
 
 const buildJsonLd = (mode: AppMode) => ({
@@ -15,15 +15,21 @@ const buildJsonLd = (mode: AppMode) => ({
       description:
         "A local-first video downloader with source-quality selection up to 8K.",
       inLanguage: "en",
-      creator: {
-        "@type": "Person",
-        name: "Zubair Hussain",
-        url: "https://zubairhussain.xyz",
-      },
+      creator: { "@id": `${creator.url}/#person` },
+      author: { "@id": `${creator.url}/#person` },
+      publisher: { "@id": `${creator.url}/#person` },
+    },
+    {
+      "@type": "Person",
+      "@id": `${creator.url}/#person`,
+      name: creator.name,
+      url: creator.url,
+      sameAs: [creator.url, "https://github.com/Zubair-hussain", repositoryUrl],
     },
     {
       "@type": "WebApplication",
       "@id": new URL("/#app", siteUrl).href,
+      author: { "@id": `${creator.url}/#person` },
       name: "Flux video downloader",
       url: new URL("/", siteUrl).href,
       applicationCategory: "MultimediaApplication",
