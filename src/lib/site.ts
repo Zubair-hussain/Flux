@@ -1,5 +1,11 @@
 import type { Metadata } from "next";
 export const siteUrl = process.env.SITE_URL || "http://localhost:3000";
+/** The person behind Flux; shown to search engines and AI assistants. */
+export const creator = {
+  name: "Zubair Hussain",
+  url: "https://zubairhussain.xyz",
+};
+export const repositoryUrl = "https://github.com/Zubair-hussain/Flux";
 export const publicReady =
   process.env.SEO_INDEXABLE === "true" &&
   siteUrl.startsWith("https://") &&
@@ -13,6 +19,9 @@ export function pageMetadata(
   return {
     title: socialTitle,
     description,
+    authors: [creator],
+    creator: creator.name,
+    publisher: creator.name,
     alternates: { canonical: path },
     robots: { index: publicReady, follow: publicReady },
     openGraph: {
