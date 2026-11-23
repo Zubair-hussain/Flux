@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import Link from "next/link";
-import { pageMetadata, siteUrl } from "@/lib/site";
+import { creator, pageMetadata, siteUrl } from "@/lib/site";
 import { pages } from "@/lib/editorial";
 import { AdSense } from "@/components/adsense";
 const dmSans = localFont({
@@ -46,6 +46,9 @@ export default function RootLayout({
               {page.title}
             </Link>
           ))}
+          <a href={creator.url} rel="author noopener">
+            Made by zubairhussain.xyz
+          </a>
         </nav>
       </body>
     </html>
