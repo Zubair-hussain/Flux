@@ -1,0 +1,13 @@
+Flux, made by Zubair Hussain.
+
+/* TEAM */
+Creator: Zubair Hussain
+Site: https://zubairhussain.xyz
+GitHub: https://github.com/Zubair-hussain
+
+/* SITE */
+Name: Flux
+Source: https://github.com/Zubair-hussain/Flux
+License: MIT
+Standards: HTML5, CSS3, Next.js, TypeScript
+Tools: yt-dlp, FFmpeg
