@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
 import {
+  directLinks,
   downloadSafetyArgs,
   formatSelector,
   proxyArgs,
@@ -140,5 +141,76 @@ describe("source failures", () => {
       expect(error.fallback).toBe("cli");
       expect(error.message).not.toContain(stderr);
     }
+  });
+});
+
+describe("direct video-file links", () => {
+  const file = (over: Record<string, unknown> = {}) => ({
+    format_id: "http-2176",
+    url: "https://video.twimg.com/ext_tw_video/1/vid/avc1/1280x720/a.mp4",
+    protocol: "https",
+    ext: "mp4",
+    width: 1280,
+    height: 720,
+    tbr: 2176,
+    ...over,
+  });
+  it("offers the platform's own single file, one per quality", () => {
+    const links = directLinks(
+      [
+        file(),
+        file({
+          url: "https://video.twimg.com/b/1920x1080/b.mp4",
+          width: 1920,
+          height: 1080,
+          tbr: 10368,
+        }),
+        file({ url: "https://video.twimg.com/c/720.mp4", tbr: 900 }),
+      ],
+      "X / Twitter",
+    );
+    expect(Object.keys(links)).toEqual(["720", "1080"]);
+    expect(links[720]).toContain("a.mp4"); // the higher-bitrate 720p wins
+  });
+  it("reads the quality from the file name when sizes are missing (LinkedIn)", () => {
+    const links = directLinks(
+      [
+        file({
+          url: "https://dms.licdn.com/playlist/vid/mp4-720p-30fp-crf28/y",
+          width: undefined,
+          height: undefined,
+        }),
+      ],
+      "LinkedIn",
+    );
+    expect(Object.keys(links)).toEqual(["720"]);
+  });
+  it("never links outside the platform's own servers", () => {
+    for (const url of [
+      "https://evil.example/a.mp4",
+      "https://video.twimg.com.evil.example/a.mp4",
+      "https://twimg.com@evil.example/a.mp4",
+      "http://video.twimg.com/a.mp4",
+      "https://user:pass@video.twimg.com/a.mp4",
+      "javascript:alert(1)",
+      "https://video.twimg.com/" + "a".repeat(4100),
+    ])
+      expect(directLinks([file({ url })], "X / Twitter")).toEqual({});
+  });
+  it("skips anything that is not one ready-made file with audio", () => {
+    for (const odd of [
+      { protocol: "m3u8_native" },
+      { fragments: [{ url: "x" }] },
+      { acodec: "none" },
+      { vcodec: "none" },
+      { has_drm: true },
+      { ext: "m4a" },
+      { http_headers: { Cookie: "a=b" } },
+    ])
+      expect(directLinks([file(odd)], "X / Twitter")).toEqual({});
+  });
+  it("is off for platforms that are not listed", () => {
+    expect(directLinks([file()], "YouTube")).toEqual({});
+    expect(directLinks([file()], "TikTok")).toEqual({});
   });
 });
