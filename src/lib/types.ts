@@ -7,6 +7,8 @@ export type VideoInfo = {
   duration: number;
   thumbnail?: string;
   qualities: Quality[];
+  /** Plain video-file links straight from the platform, by quality (only where the platform offers one). */
+  direct?: Partial<Record<Quality, string>>;
 };
 export type Job = {
   id: string;
