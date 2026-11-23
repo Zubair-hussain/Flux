@@ -305,6 +305,38 @@ describe("download engine", () => {
     expect(tiktok).not.toContain("--proxy");
     vi.unstubAllEnvs();
   });
+  it("includes direct file links for the qualities the visitor can pick", async () => {
+    mocks.run.mockImplementation(async (_binary, args: string[]) => ({
+      stdout: args.includes("--dump-single-json")
+        ? JSON.stringify({
+            ...metadata,
+            formats: [
+              {
+                url: "https://video.twimg.com/a/1280x720/a.mp4",
+                protocol: "https",
+                ext: "mp4",
+                width: 1280,
+                height: 720,
+              },
+              {
+                url: "https://video.twimg.com/b/1920x1080/b.mp4",
+                protocol: "https",
+                ext: "mp4",
+                width: 1920,
+                height: 1080,
+              },
+            ],
+          })
+        : "",
+    }));
+    vi.stubEnv("FLUX_MAX_HEIGHT", "720");
+    const info = await inspectVideo("https://x.com/user/status/123456789");
+    // 1080p is above this server's cap, so neither download nor link is offered
+    expect(info.qualities).toEqual([720]);
+    expect(Object.keys(info.direct ?? {})).toEqual(["720"]);
+    expect(info.direct?.[720]).toContain("twimg.com");
+    vi.unstubAllEnvs();
+  });
   it("fails a job when no finished media file is produced", async () => {
     mocks.names = ["video.mkv.part"];
     const job = await createJob("https://youtu.be/abc", 1080);
