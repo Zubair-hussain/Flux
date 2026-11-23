@@ -1,7 +1,8 @@
 import { ContentPage } from "@/components/content-page";
 import { bloggerPosts } from "@/lib/blogger";
 import { pageMetadata } from "@/lib/site";
-export const revalidate = 300;
+// Read Blogger on each request so new articles appear without a redeploy.
+export const dynamic = "force-dynamic";
 export const metadata = pageMetadata(
   "Video download guides and updates",
   "Practical Flux guides, source-quality explanations, and updates from our Blogger publication.",
