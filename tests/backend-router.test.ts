@@ -166,6 +166,38 @@ it("never replays an ambiguous download POST", async () => {
   ).toHaveLength(1);
 });
 
+it("waits for sleeping servers when the initial health checks time out", async () => {
+  let probes = 0;
+  fetcher.mockImplementation(async (url) => {
+    if (String(url).endsWith("/api/health")) {
+      if (++probes <= 2) throw new DOMException("Starting", "TimeoutError");
+      return Response.json({ active: 0, capacity: 1 });
+    }
+    return Response.json({ id }, { status: 202 });
+  });
+  expect((await routeBackend(request(), "/api/downloads")).status).toBe(202);
+  expect(probes).toBe(4);
+  expect(
+    fetcher.mock.calls.filter(([, init]) => init.method === "POST"),
+  ).toHaveLength(1);
+});
+
+it("uses a warm server without waiting for a sleeping peer", async () => {
+  let probes = 0;
+  fetcher.mockImplementation(async (url) => {
+    if (String(url).endsWith("/api/health")) {
+      probes++;
+      if (String(url).includes("one.test"))
+        throw new DOMException("Starting", "TimeoutError");
+      return Response.json({ active: 0, capacity: 1 });
+    }
+    return Response.json({ id }, { status: 202 });
+  });
+  expect((await routeBackend(request(), "/api/downloads")).status).toBe(202);
+  expect(probes).toBe(2);
+  expect(fetcher.mock.calls[2][0]).toBe("https://two.test/api/downloads");
+});
+
 it("blocks direct backend access while allowing authenticated router requests", () => {
   vi.stubEnv("FLUX_ROUTER", "false");
   vi.stubEnv("FLUX_HOSTED", "true");

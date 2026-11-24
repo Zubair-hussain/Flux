@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { platforms, qualityLabel, type Quality } from "@/lib/platforms";
 import { useTurnstile } from "@/components/use-turnstile";
+import { DownloadStories } from "@/components/download-stories";
 import type { Job, VideoInfo } from "@/lib/types";
 import { version as cliVersion } from "../../packages/cli/package.json";
 
@@ -141,6 +142,7 @@ export function FluxApp({
   const [video, setVideo] = useState<VideoInfo | null>(null);
   const [quality, setQuality] = useState<Quality>(1080);
   const [busy, setBusy] = useState(false);
+  const [downloadPending, setDownloadPending] = useState(false);
   const [error, setError] = useState("");
   const [jobs, setJobs] = useState<Job[]>([]);
   const [tab, setTab] = useState<"video" | "queue">("video");
@@ -294,6 +296,8 @@ export function FluxApp({
   async function download() {
     if (!video) return;
     setBusy(true);
+    setDownloadPending(true);
+    setTab("queue");
     setError("");
     try {
       const turnstileToken = await human.getToken();
@@ -309,8 +313,10 @@ export function FluxApp({
       setNotice("Download started. You can save the file when it is ready.");
     } catch (e) {
       setError(friendly(e) + offerCommand(e));
+      setTab("video");
     } finally {
       setBusy(false);
+      setDownloadPending(false);
     }
   }
   async function paste() {
@@ -763,8 +769,12 @@ export function FluxApp({
               <p>
                 {complete} ready to save · {jobs.length} total downloads
               </p>
+              {(downloadPending || hasActiveJobs) && (
+                <DownloadStories starting={downloadPending} />
+              )}
               <div className="queue-list">
-                {jobs.length === 0 ? (
+                {jobs.length === 0 && downloadPending ? null : jobs.length ===
+                  0 ? (
                   <div className="empty-state">
                     <Download size={40} />
                     <h2>A little empty. For now.</h2>

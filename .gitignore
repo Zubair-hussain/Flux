@@ -22,5 +22,7 @@ packages/cli/LEGAL.md
 .wrangler/
 .dev.vars
 .dev.vars.*
+videos/**/.hyperframes/
+videos/**/renders/
 # Downloaded Firebase service-account credentials must remain private.
 *firebase-adminsdk*.json

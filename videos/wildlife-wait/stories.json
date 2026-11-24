@@ -1,0 +1,65 @@
+[
+  {
+    "id": "fox-firefly",
+    "title": "Fox & the firefly",
+    "description": "A curious fox follows a little light through the moonlit woods.",
+    "start": 0,
+    "duration": 10
+  },
+  {
+    "id": "owl-moon",
+    "title": "Owl's moonlit flight",
+    "description": "A little owl leaves its branch for a moonlit adventure.",
+    "start": 10,
+    "duration": 10
+  },
+  {
+    "id": "rabbit-carrot",
+    "title": "A very lucky rabbit",
+    "description": "One determined rabbit finds the perfect midnight snack.",
+    "start": 20,
+    "duration": 10
+  },
+  {
+    "id": "turtle-tide",
+    "title": "Together to the tide",
+    "description": "A turtle leads a tiny hatchling toward the gentle sea.",
+    "start": 30,
+    "duration": 10
+  },
+  {
+    "id": "otter-shell",
+    "title": "Otter's little treasure",
+    "description": "A floating otter discovers a tiny shell worth keeping.",
+    "start": 40,
+    "duration": 10
+  },
+  {
+    "id": "hedgehog-rain",
+    "title": "A leaf for a rainy day",
+    "description": "A resourceful hedgehog turns a fallen leaf into an umbrella.",
+    "start": 50,
+    "duration": 10
+  },
+  {
+    "id": "whale-bubbles",
+    "title": "A whale of a little tale",
+    "description": "A whale and its calf send a trail of bubbles toward the stars.",
+    "start": 60,
+    "duration": 10
+  },
+  {
+    "id": "deer-butterfly",
+    "title": "An unexpected friend",
+    "description": "A shy deer pauses to greet a wandering butterfly.",
+    "start": 70,
+    "duration": 10
+  },
+  {
+    "id": "penguin-friends",
+    "title": "Slide into a friendship",
+    "description": "A little penguin slides across the ice to meet a friend.",
+    "start": 80,
+    "duration": 10
+  }
+]

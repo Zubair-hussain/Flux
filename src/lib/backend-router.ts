@@ -91,50 +91,64 @@ export async function routeBackend(
       throw new AppError("This download's server is unavailable.", 503);
     candidates = [owner];
   } else {
-    const available = await Promise.all(
-      Object.values(configured).map(async ({ url, fallback }) => {
-        try {
-          const response = await fetch(`${url}/api/health`, {
-            headers: {
-              "X-Flux-Router-Secret": process.env.FLUX_ROUTER_SECRET!,
-            },
-            redirect: "manual",
-            cache: "no-store",
-            signal: AbortSignal.timeout(5_000),
-          });
-          if (!response.ok) {
-            console.warn("Flux backend health rejected", url, response.status);
-            return null;
-          }
-          const health = await response.json();
-          if (
-            !Number.isInteger(health.active) ||
-            !Number.isInteger(health.capacity) ||
-            health.active < 0 ||
-            health.capacity <= health.active
-          ) {
-            console.warn("Flux backend capacity unavailable", url, {
-              active: health.active,
-              capacity: health.capacity,
-            });
-            return null;
-          }
-          return {
-            url,
-            fallback,
-            load: health.active / health.capacity,
-            tie: Math.random(),
-          };
-        } catch (error) {
-          console.warn(
-            "Flux backend health request failed",
-            url,
-            error instanceof Error ? error.name : "UnknownError",
-          );
+    const starting = new Set<string>();
+    const probe = async ({ url, fallback }: Backend, timeout: number) => {
+      try {
+        const response = await fetch(`${url}/api/health`, {
+          headers: {
+            "X-Flux-Router-Secret": process.env.FLUX_ROUTER_SECRET!,
+          },
+          redirect: "manual",
+          cache: "no-store",
+          signal: AbortSignal.timeout(timeout),
+        });
+        if (!response.ok) {
+          console.warn("Flux backend health rejected", url, response.status);
           return null;
         }
-      }),
+        const health = await response.json();
+        if (
+          !Number.isInteger(health.active) ||
+          !Number.isInteger(health.capacity) ||
+          health.active < 0 ||
+          health.capacity <= health.active
+        ) {
+          console.warn("Flux backend capacity unavailable", url, {
+            active: health.active,
+            capacity: health.capacity,
+          });
+          return null;
+        }
+        return {
+          url,
+          fallback,
+          load: health.active / health.capacity,
+          tie: Math.random(),
+        };
+      } catch (error) {
+        if (error instanceof Error && error.name === "TimeoutError")
+          starting.add(url);
+        console.warn(
+          "Flux backend health request failed",
+          url,
+          error instanceof Error ? error.name : "UnknownError",
+        );
+        return null;
+      }
+    };
+    let available = await Promise.all(
+      Object.values(configured).map((backend) => probe(backend, 5_000)),
     );
+    // Free Render services sleep when idle. A five-second timeout wakes them
+    // but is too short to finish startup. Wait only when no warm server exists;
+    // full or unauthorized servers should still fail immediately.
+    if (!available.some((backend) => backend !== null) && starting.size) {
+      available = await Promise.all(
+        Object.values(configured)
+          .filter((backend) => starting.has(backend.url))
+          .map((backend) => probe(backend, 60_000)),
+      );
+    }
     // Primary servers first (least loaded first), fallback servers after them.
     candidates = available
       .filter((item) => item !== null)

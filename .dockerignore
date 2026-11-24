@@ -17,5 +17,6 @@ playwright-report
 reports
 packages/cli/dist
 docs/media
+videos
 *.tsbuildinfo
 image-*.png

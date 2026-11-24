@@ -40,8 +40,8 @@ const images = [
     html: `
       <style>${base}
         .wrap { position: relative; width: 1200px; height: 630px; padding: 56px 64px; }
-        h1 { font-size: 84px; line-height: 1.02; letter-spacing: -3px; font-weight: 800; margin-top: 54px; max-width: 980px; }
-        p.sub { font-size: 30px; line-height: 1.4; margin-top: 26px; max-width: 800px; color: #c9c5da; }
+        h1 { font-size: 150px; line-height: 0.98; letter-spacing: -6px; font-weight: 800; margin-top: 60px; }
+        p.sub { font-size: 38px; line-height: 1.3; margin-top: 34px; max-width: 920px; color: #c9c5da; font-weight: 500; }
         .chips { position: absolute; right: 64px; top: 60px; display: flex; gap: 12px; }
         .chips span { border: 1px solid #3a3247; background: #17161f; padding: 10px 18px; border-radius: 999px; font-weight: 700; font-size: 22px; color: #d9cffa; }
         .chips span.on { background: linear-gradient(135deg, #c7b3ff, #9873ff); color: #17102b; border-color: transparent; }
@@ -49,8 +49,8 @@ const images = [
       <div class="wrap">
         ${brand}
         <div class="chips"><span>720p</span><span>1080p</span><span class="on">4K</span><span>8K</span></div>
-        <h1>Why a 4K video isn't <span class="accent">always 4K</span></h1>
-        <p class="sub">How Flux finds the real quality of a video, with numbers from real tests.</p>
+        <h1>Why 4K<br><span class="accent">isn't always 4K</span></h1>
+        <p class="sub">Your 4K video may not be real 4K.</p>
         <div class="site">By Zubair Hussain · zubairhussain.xyz</div>
       </div>`,
   },
