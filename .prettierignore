@@ -15,3 +15,6 @@ public/downloads/
 !.env.example
 .dev.vars*
 **/*firebase-adminsdk*.json
+
+# Generated Blogger post: inline-styled HTML pasted into Blogger
+docs/blog/first-post.html
