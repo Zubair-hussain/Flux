@@ -59,9 +59,9 @@ export function heroSvg() {
     id,
     width: 1200,
     height: 630,
-    title: "Why a 4K video isn't always 4K",
+    title: "Why 4K isn't always 4K",
     description:
-      "Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K.",
+      "Flux banner reading: Why 4K isn't always 4K. Your 4K video may not be real 4K, with quality chips for 720p, 1080p, 4K and 8K.",
     body: `
   ${chips
     .map(
@@ -69,10 +69,9 @@ export function heroSvg() {
         `<g><rect x="${x}" y="54" width="${label.length * 14 + 40}" height="44" rx="22" fill="${on ? `url(#${id}-accent)` : "#17161f"}" stroke="${on ? "none" : "#3a3247"}"/><text x="${x + (label.length * 14 + 40) / 2}" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="${on ? "#17102b" : "#d9cffa"}">${label}</text></g>`,
     )
     .join("\n  ")}
-  <text x="64" y="240" font-size="84" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why a 4K video isn't</text>
-  <text x="64" y="330" font-size="84" font-weight="800" fill="url(#${id}-accent)" letter-spacing="-3">always 4K</text>
-  <text x="64" y="410" font-size="30" fill="#c9c5da">How Flux finds the real quality of a video,</text>
-  <text x="64" y="452" font-size="30" fill="#c9c5da">with numbers from real tests.</text>
+  <text x="64" y="272" font-size="150" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why 4K</text>
+  <text x="64" y="418" font-size="150" font-weight="800" fill="url(#${id}-accent)" letter-spacing="-3">isn't always 4K</text>
+  <text x="64" y="500" font-size="38" font-weight="500" fill="#c9c5da">Your 4K video may not be real 4K.</text>
   <text x="64" y="585" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>`,
   });
 }
