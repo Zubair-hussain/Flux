@@ -63,13 +63,13 @@ const callout = (title, body) => `
 const button = (href, label) =>
   `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#c7b3ff,#9873ff);color:#17102b;font-weight:800;font-size:17px;text-decoration:none;padding:14px 26px;border-radius:12px;">${label}</a>`;
 
-const title = "Why a 4K video isn't always 4K: how Flux finds the real quality";
+const title = "Why 4K Isn't Always 4K";
 const description =
-  "What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.";
-const labels = "video quality, downloads, guides";
+  "Your 4K video may not be real 4K. See how Flux finds the true quality, with numbers from real tests.";
+const labels = "video quality, 4K vs 1080p, video downloader, Flux";
 const ogImage = `${site}/blog/why-4k-is-not-always-4k-hero.png`;
 const ogAlt =
-  "Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K";
+  "Flux banner reading: Why 4K isn't always 4K. Your 4K video may not be real 4K, with quality chips for 720p, 1080p, 4K and 8K";
 
 const content = `
 ${p(`When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice the numbers can mislead. This guide explains how ${a(site + "/", "Flux")} decides what to offer, using results from our own tests in November 2026.`)}
@@ -137,7 +137,8 @@ const bloggerHeader = `<!--
   4. Labels:              ${labels}
   5. Post settings, Search description (${description.length} characters):
      ${description}
-  6. Publish. It appears on the website's Blog page and in /llms.txt within about 5 minutes.
+  6. Permalink (custom):  why-4k-isnt-always-4k
+  7. Publish. It appears on the website's Blog page and in /llms.txt within about 5 minutes.
   The figures are inline SVG code, so no image files are needed.
   Social preview: Blogger takes og:image from the first <img> in a post, and inline SVG is not one.
   See first-post-full.html (and its og:image) and docs/BLOGGER.md for how to set the preview image.
