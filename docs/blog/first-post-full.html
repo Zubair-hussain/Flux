@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Why a 4K video isn't always 4K: how Flux finds the real quality</title>
+  <meta name="description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <meta name="author" content="Zubair Hussain">
+  <meta name="robots" content="index, follow, max-image-preview:large">
+  <!-- Open Graph: Facebook, LinkedIn, WhatsApp, Discord, Slack -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Flux">
+  <meta property="og:title" content="Why a 4K video isn't always 4K: how Flux finds the real quality">
+  <meta property="og:description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <meta property="og:image" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
+  <meta property="og:image:secure_url" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K">
+  <meta property="og:locale" content="en_US">
+  <meta property="article:published_time" content="2026-11-24">
+  <meta property="article:author" content="https://zubairhussain.xyz">
+  <meta property="article:tag" content="video quality">
+  <meta property="article:tag" content="downloads">
+  <!-- Twitter / X -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Why a 4K video isn't always 4K: how Flux finds the real quality">
+  <meta name="twitter:description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <meta name="twitter:image" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
+  <meta name="twitter:image:alt" content="Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why a 4K video isn't always 4K: how Flux finds the real quality","description":"What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.","image":["https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png"],"datePublished":"2026-11-24","dateModified":"2026-11-24","inLanguage":"en","author":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"publisher":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"keywords":"video quality, downloads, guides"}</script>
+</head>
+<body style="margin:0;background:#101116;">
+<article style="padding:24px 16px;">
+<div style="font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:#101116;color:#c9c5da;border-radius:20px;padding:30px 28px;max-width:760px;margin:0 auto;">
+<h1 style="font-size:40px;line-height:1.1;letter-spacing:-1.2px;color:#f3f2fa;margin:0 0 22px;">Why a 4K video isn't always 4K: how Flux finds the real quality</h1>
+<p style="font-size:15px;color:#9899ad;margin:0 0 22px;">By <a href="https://zubairhussain.xyz" style="color:#c6a8ff;text-decoration:underline;">Zubair Hussain</a> · <time datetime="2026-11-24">2026-11-24</time></p>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice the numbers can mislead. This guide explains how <a href="https://flux.detroonshah.workers.dev/" style="color:#c6a8ff;text-decoration:underline;">Flux</a> decides what to offer, using results from our own tests in November 2026.</p>
+
+
+<figure style="margin:26px 0;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="fx-hero-t fx-hero-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-hero-t">Why a 4K video isn't always 4K</title>
+  <desc id="fx-hero-d">Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K.</desc>
+  <defs>
+    <linearGradient id="fx-hero-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-hero-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-hero-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-hero-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#101116"/>
+  <rect width="1200" height="630" fill="url(#fx-hero-glow1)"/>
+  <rect width="1200" height="630" fill="url(#fx-hero-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-hero-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <g><rect x="758" y="54" width="96" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="806" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">720p</text></g>
+  <g><rect x="866" y="54" width="110" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="921" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">1080p</text></g>
+  <g><rect x="988" y="54" width="68" height="44" rx="22" fill="url(#fx-hero-accent)" stroke="none"/><text x="1022" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#17102b">4K</text></g>
+  <g><rect x="1068" y="54" width="68" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="1102" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">8K</text></g>
+  <text x="64" y="240" font-size="84" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why a 4K video isn't</text>
+  <text x="64" y="330" font-size="84" font-weight="800" fill="url(#fx-hero-accent)" letter-spacing="-3">always 4K</text>
+  <text x="64" y="410" font-size="30" fill="#c9c5da">How Flux finds the real quality of a video,</text>
+  <text x="64" y="452" font-size="30" fill="#c9c5da">with numbers from real tests.</text>
+  <text x="64" y="585" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>
+</svg>
+  <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">How Flux finds the real quality of a video.</figcaption>
+</figure>
+
+
+<div style="background:#191a22;border:1px solid #3a3247;border-radius:14px;padding:20px 22px;margin:24px 0;">
+  <div style="font-weight:800;color:#f3f2fa;font-size:18px;margin-bottom:8px;">The short version</div>
+  <ul style="font-size:17px;line-height:1.7;margin:0 0 18px;padding-left:22px;"><li style="margin:0 0 8px;color:#c9c5da;">Flux only offers qualities the video really has, and never stretches a small picture.</li><li style="margin:0 0 8px;color:#c9c5da;">Tall phone videos are counted by their short side: 720&times;1280 is a 720p source.</li><li style="margin:0 0 8px;color:#c9c5da;">4K files are far bigger than 1080p, and on most screens the difference is hard to see.</li></ul>
+</div>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Flux only offers what the source really has</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">Flux reads the list of versions that a platform actually provides and shows only those, from 720p up to 8K. It never creates a higher resolution by stretching a smaller picture. A 720p upload stays a 720p download, because upscaling adds file size but no detail.</p>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Vertical videos count by their short side</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">Phone videos are tall, not wide. A TikTok clip we tested measured 720&times;1280. The shorter side is 720, so Flux calls it a <strong style="color:#f3f2fa;">720p</strong> source. Judging by the long side would label it &ldquo;1280p&rdquo;, which exists on no quality menu and would promise detail the video does not have.</p>
+
+
+<figure style="margin:26px 0;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="fx-vertical-t fx-vertical-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-vertical-t">Tall videos count by the short side</title>
+  <desc id="fx-vertical-d">Diagram of a tall phone video measuring 720 pixels wide by 1280 pixels high, labelled as a 720p source because quality is counted by the short side.</desc>
+  <defs>
+    <linearGradient id="fx-vertical-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-vertical-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-vertical-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-vertical-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#101116"/>
+  <rect width="1200" height="675" fill="url(#fx-vertical-glow1)"/>
+  <rect width="1200" height="675" fill="url(#fx-vertical-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-vertical-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <text x="64" y="178" font-size="52" font-weight="800" fill="#f3f2fa" letter-spacing="-1.5">Tall videos count by</text>
+  <text x="64" y="236" font-size="52" font-weight="800" fill="url(#fx-vertical-accent)" letter-spacing="-1.5">the short side</text>
+  <text x="64" y="300" font-size="26" fill="#c9c5da">A phone clip measuring 720×1280 is a 720p</text>
+  <text x="64" y="336" font-size="26" fill="#c9c5da">source. Calling it "1280p" would promise</text>
+  <text x="64" y="372" font-size="26" fill="#c9c5da">detail the video does not have.</text>
+  <rect x="740" y="56" width="270" height="480" rx="30" fill="#1d1830" stroke="#9873ff" stroke-width="2"/>
+  <text x="875" y="318" font-size="46" font-weight="800" text-anchor="middle" fill="url(#fx-vertical-accent)">720p</text>
+  <line x1="740" y1="560" x2="1010" y2="560" stroke="#c7b3ff" stroke-width="3"/>
+  <text x="875" y="598" font-size="28" font-weight="800" text-anchor="middle" fill="#c7b3ff">720 px</text>
+  <text x="1056" y="296" font-size="26" font-weight="700" text-anchor="middle" fill="#9899ad" transform="rotate(90 1056 296)">1280 px (long side)</text>
+  <text x="64" y="628" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>
+</svg>
+  <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">A 720&times;1280 clip is a 720p source.</figcaption>
+</figure>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">What different platforms offered in our tests</h2>
+<ul style="font-size:17px;line-height:1.7;margin:0 0 18px;padding-left:22px;"><li style="margin:0 0 8px;color:#c9c5da;"><strong style="color:#f3f2fa;">Dailymotion</strong> sample: versions up to 4K.</li><li style="margin:0 0 8px;color:#c9c5da;"><strong style="color:#f3f2fa;">Pinterest</strong> sample: up to 1080p.</li><li style="margin:0 0 8px;color:#c9c5da;"><strong style="color:#f3f2fa;">TikTok</strong> sample: 720p and 1080p.</li><li style="margin:0 0 8px;color:#c9c5da;"><strong style="color:#f3f2fa;">Instagram, Streamable and Loom</strong> samples: 720p only.</li></ul>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">These are single samples, not guarantees. Each uploader chooses how much quality to publish, and platforms change often.</p>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Why 4K files are so much bigger</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">In the same Dailymotion test, the 1080p version was about 61 MB and the 4K version about 216 MB, roughly 3.5 times larger. On a phone or a laptop screen the difference is hard to see, so 1080p is usually the better choice. Pick 4K when you will watch on a large screen or edit and crop the footage.</p>
+
+
+<figure style="margin:26px 0;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="fx-chart-t fx-chart-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-chart-t">File size by quality for one video</title>
+  <desc id="fx-chart-d">Bar chart of one Dailymotion video's file size by quality: about 28 MB at 720p, 61 MB at 1080p, 136 MB at 1440p and 216 MB at 4K.</desc>
+  <defs>
+    <linearGradient id="fx-chart-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-chart-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-chart-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-chart-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#101116"/>
+  <rect width="1200" height="675" fill="url(#fx-chart-glow1)"/>
+  <rect width="1200" height="675" fill="url(#fx-chart-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-chart-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <text x="64" y="176" font-size="52" font-weight="800" fill="#f3f2fa" letter-spacing="-1.5">Same video, <tspan fill="url(#fx-chart-accent)">four sizes</tspan></text>
+  <text x="64" y="218" font-size="24" fill="#9899ad">4K is about 3.5 times larger than 1080p. One Dailymotion sample, November 2026.</text>
+  <g>
+    <text x="64" y="295" font-size="32" font-weight="800" fill="#f3f2fa">720p</text>
+    <rect x="206" y="262" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="262" width="98.8" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="295" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~28 MB</text>
+  </g>
+  <g>
+    <text x="64" y="363" font-size="32" font-weight="800" fill="#f3f2fa">1080p</text>
+    <rect x="206" y="330" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="330" width="212.6" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="363" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~61 MB</text>
+  </g>
+  <g>
+    <text x="64" y="431" font-size="32" font-weight="800" fill="#f3f2fa">1440p</text>
+    <rect x="206" y="398" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="398" width="476.4" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="431" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~136 MB</text>
+  </g>
+  <g>
+    <text x="64" y="499" font-size="32" font-weight="800" fill="#f3f2fa">4K</text>
+    <rect x="206" y="466" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="466" width="758.0" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="499" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~216 MB</text>
+  </g>
+  <text x="64" y="628" font-size="22" fill="#9899ad">Sizes are estimates listed by the platform · flux.detroonshah.workers.dev</text>
+</svg>
+  <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">File size grows quickly with resolution. Sizes are estimates listed by the platform.</figcaption>
+</figure>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Why some files are MKV</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">At higher quality, many platforms deliver the picture and the sound as separate files. Flux joins them with FFmpeg into one file. When the two parts use different codecs, MKV can hold them together without re-encoding, so nothing is lost. VLC, mpv and most modern players open MKV directly.</p>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Download only what you may keep</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">A public video is not automatically free to reuse. Save videos you own, that you have permission to keep, or that are licensed for it, and follow each platform's terms. Flux does not bypass DRM, sign-in or paywalls, and it blocks live streams, playlists and age-restricted or sexual content. Read the <a href="https://flux.detroonshah.workers.dev/content-policy" style="color:#c6a8ff;text-decoration:underline;">content policy</a> for details.</p>
+
+<h2 style="font-size:26px;line-height:1.25;margin:38px 0 14px;color:#f3f2fa;padding-left:14px;border-left:4px solid #ad91ff;letter-spacing:-0.4px;">Try it</h2>
+<p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">Paste a public video link into <a href="https://flux.detroonshah.workers.dev/" style="color:#c6a8ff;text-decoration:underline;">Flux</a>, check which qualities the source offers, and choose the one that fits. If a link cannot be fetched from our server, Flux shows a command you can run on your own computer instead. The source code is open on <a href="https://github.com/Zubair-hussain/Flux" style="color:#c6a8ff;text-decoration:underline;">GitHub</a>.</p>
+
+<div style="background:linear-gradient(135deg,#2a1f4d,#191a22);border:1px solid #6d5aa8;border-radius:18px;padding:28px 26px;margin:34px 0 22px;text-align:center;">
+  <div style="font-size:24px;font-weight:800;color:#f3f2fa;letter-spacing:-0.4px;margin-bottom:8px;">Want something like this built?</div>
+  <p style="font-size:17px;line-height:1.6;color:#c9c5da;margin:0 0 20px;">Flux started as one idea, a downloader that is honest about quality. If you have a tool, website or automation in mind, book a short call and tell me about it.</p>
+  <a href="SCHEDULE_LINK_HERE" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#c7b3ff,#9873ff);color:#17102b;font-weight:800;font-size:17px;text-decoration:none;padding:14px 26px;border-radius:12px;">Book a call with Zubair</a>
+  <div style="font-size:13px;color:#9899ad;margin-top:12px;">Free to book. No obligation.</div>
+</div>
+
+<p style="font-size:15px;color:#9899ad;margin:0;"><em>Flux is made by <a href="https://zubairhussain.xyz" style="color:#c6a8ff;text-decoration:underline;">Zubair Hussain (zubairhussain.xyz)</a>.</em></p>
+</div>
+</article>
+</body>
+</html>
