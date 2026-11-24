@@ -39,10 +39,11 @@ test("public pages have unique metadata, breadcrumbs, working social images and 
       .getAttribute("content");
     expect(image).toContain(`/social/${slug}.png`);
     expect((await request.get(`/social/${slug}.png`)).status()).toBe(200);
-    const schema = JSON.parse(
-      await page.locator('script[type="application/ld+json"]').innerText(),
-    );
-    expect(schema["@type"]).toBe("BreadcrumbList");
+    const schemas = (
+      await page.locator('script[type="application/ld+json"]').allInnerTexts()
+    ).map((text) => JSON.parse(text));
+    const schema = schemas.find((item) => item["@type"] === "BreadcrumbList");
+    expect(schema).toBeDefined();
     expect(schema.itemListElement[1].item).toBe(
       `http://localhost:3000/${slug}`,
     );
