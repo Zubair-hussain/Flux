@@ -1,6 +1,6 @@
 import { ContentPage } from "@/components/content-page";
 import { bloggerPosts } from "@/lib/blogger";
-import { pageMetadata } from "@/lib/site";
+import { creator, pageMetadata, siteUrl } from "@/lib/site";
 // Read Blogger on each request so new articles appear without a redeploy.
 export const dynamic = "force-dynamic";
 export const metadata = pageMetadata(
@@ -10,6 +10,22 @@ export const metadata = pageMetadata(
 );
 export default async function Blog() {
   const posts = await bloggerPosts();
+  // Lets search engines read each article with its date and author.
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Flux blog",
+    url: new URL("/blog", siteUrl).href,
+    author: { "@type": "Person", name: creator.name, url: creator.url },
+    publisher: { "@type": "Person", name: creator.name, url: creator.url },
+    blogPost: posts.map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      url: post.url,
+      ...(post.published ? { datePublished: post.published } : {}),
+      author: { "@type": "Person", name: creator.name, url: creator.url },
+    })),
+  };
   return (
     <ContentPage
       title="Flux blog"
@@ -91,6 +107,12 @@ export default async function Blog() {
           not replace the creator’s license or the platform’s terms.
         </p>
       </section>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(schema).replace(/</g, "\\u003c"),
+        }}
+      />
     </ContentPage>
   );
 }
