@@ -1,9 +1,13 @@
-// Builds the first Blogger article as paste-ready HTML in Flux's style
-// (all styles inline, because Blogger themes override page styles).
+// Builds the first Blogger article in Flux's style (all styles inline, because
+// Blogger themes override page styles). The figures are inline SVG code.
 //   node scripts/build-blog-post.mjs --schedule https://your-booking-link
-// Output: docs/blog/first-post.html
+//        [--site https://...] [--canonical https://post-address] [--date 2026-11-24]
+// Output:
+//   docs/blog/first-post.html       paste into Blogger's HTML view
+//   docs/blog/first-post-full.html  complete page with Open Graph, Twitter and article data
 import { writeFile } from "node:fs/promises";
 import path from "node:path";
+import { chartSvg, heroSvg, verticalSvg } from "./blog/svg-figures.mjs";
 
 const args = process.argv.slice(2);
 const option = (name, fallback) => {
@@ -15,16 +19,20 @@ const site = option("site", "https://flux.detroonshah.workers.dev").replace(
   "",
 );
 const schedule = option("schedule", "SCHEDULE_LINK_HERE");
-if (
-  schedule !== "SCHEDULE_LINK_HERE" &&
-  !/^https:\/\/[^\s"<>]+$/.test(schedule)
-)
-  throw new Error("--schedule must be a full https:// link");
+const canonical = option("canonical", "");
+const date = option("date", new Date().toISOString().slice(0, 10));
+for (const [name, value] of [
+  ["--schedule", schedule === "SCHEDULE_LINK_HERE" ? "" : schedule],
+  ["--canonical", canonical],
+])
+  if (value && !/^https:\/\/[^\s"<>]+$/.test(value))
+    throw new Error(`${name} must be a full https:// link`);
+if (!/^\d{4}-\d{2}-\d{2}$/.test(date))
+  throw new Error("--date must look like 2026-11-24");
 
 const c = {
   bg: "#101116",
   panel: "#191a22",
-  line: "#2a2b36",
   text: "#c9c5da",
   white: "#f3f2fa",
   violet: "#ad91ff",
@@ -41,11 +49,10 @@ const a = (href, t) =>
 const li = (t) => `<li style="margin:0 0 8px;color:${c.text};">${t}</li>`;
 const ul = (items) =>
   `<ul style="font-size:17px;line-height:1.7;margin:0 0 18px;padding-left:22px;">${items.map(li).join("")}</ul>`;
-const figure = (file, alt, caption, width, height, first = false) => `
+const strong = (t) => `<strong style="color:${c.white};">${t}</strong>`;
+const figure = (svg, caption) => `
 <figure style="margin:26px 0;">
-  <img src="${site}/blog/${file}" alt="${alt}" width="${width}" height="${height}" ${
-    first ? 'fetchpriority="high"' : 'loading="lazy"'
-  } decoding="async" style="width:100%;height:auto;display:block;border-radius:14px;border:1px solid ${c.line};">
+  ${svg}
   <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">${caption}</figcaption>
 </figure>`;
 const callout = (title, body) => `
@@ -56,19 +63,18 @@ const callout = (title, body) => `
 const button = (href, label) =>
   `<a href="${href}" target="_blank" rel="noopener" style="display:inline-block;background:linear-gradient(135deg,#c7b3ff,#9873ff);color:#17102b;font-weight:800;font-size:17px;text-decoration:none;padding:14px 26px;border-radius:12px;">${label}</a>`;
 
-const post = `
-<div style="font-family:${font};background:${c.bg};color:${c.text};border-radius:20px;padding:30px 28px;max-width:760px;margin:0 auto;">
+const title = "Why a 4K video isn't always 4K: how Flux finds the real quality";
+const description =
+  "What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.";
+const labels = "video quality, downloads, guides";
+const ogImage = `${site}/blog/why-4k-is-not-always-4k-hero.png`;
+const ogAlt =
+  "Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K";
 
+const content = `
 ${p(`When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice the numbers can mislead. This guide explains how ${a(site + "/", "Flux")} decides what to offer, using results from our own tests in November 2026.`)}
 
-${figure(
-  "why-4k-is-not-always-4k-hero.png",
-  "Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K",
-  "How Flux finds the real quality of a video.",
-  1200,
-  630,
-  true,
-)}
+${figure(heroSvg(), "How Flux finds the real quality of a video.")}
 
 ${callout(
   "The short version",
@@ -83,43 +89,23 @@ ${h2("Flux only offers what the source really has")}
 ${p("Flux reads the list of versions that a platform actually provides and shows only those, from 720p up to 8K. It never creates a higher resolution by stretching a smaller picture. A 720p upload stays a 720p download, because upscaling adds file size but no detail.")}
 
 ${h2("Vertical videos count by their short side")}
-${p('Phone videos are tall, not wide. A TikTok clip we tested measured 720&times;1280. The shorter side is 720, so Flux calls it a <strong style="color:' + c.white + ';">720p</strong> source. Judging by the long side would label it &ldquo;1280p&rdquo;, which exists on no quality menu and would promise detail the video does not have.')}
+${p(`Phone videos are tall, not wide. A TikTok clip we tested measured 720&times;1280. The shorter side is 720, so Flux calls it a ${strong("720p")} source. Judging by the long side would label it &ldquo;1280p&rdquo;, which exists on no quality menu and would promise detail the video does not have.`)}
 
-${figure(
-  "vertical-video-quality.png",
-  "Diagram of a tall phone video measuring 720 pixels wide by 1280 pixels high, labelled as a 720p source because quality is counted by the short side",
-  "A 720&times;1280 clip is a 720p source.",
-  1200,
-  675,
-)}
+${figure(verticalSvg(), "A 720&times;1280 clip is a 720p source.")}
 
 ${h2("What different platforms offered in our tests")}
 ${ul([
-  '<strong style="color:' +
-    c.white +
-    ';">Dailymotion</strong> sample: versions up to 4K.',
-  '<strong style="color:' +
-    c.white +
-    ';">Pinterest</strong> sample: up to 1080p.',
-  '<strong style="color:' +
-    c.white +
-    ';">TikTok</strong> sample: 720p and 1080p.',
-  '<strong style="color:' +
-    c.white +
-    ';">Instagram, Streamable and Loom</strong> samples: 720p only.',
+  `${strong("Dailymotion")} sample: versions up to 4K.`,
+  `${strong("Pinterest")} sample: up to 1080p.`,
+  `${strong("TikTok")} sample: 720p and 1080p.`,
+  `${strong("Instagram, Streamable and Loom")} samples: 720p only.`,
 ])}
 ${p("These are single samples, not guarantees. Each uploader chooses how much quality to publish, and platforms change often.")}
 
 ${h2("Why 4K files are so much bigger")}
 ${p("In the same Dailymotion test, the 1080p version was about 61 MB and the 4K version about 216 MB, roughly 3.5 times larger. On a phone or a laptop screen the difference is hard to see, so 1080p is usually the better choice. Pick 4K when you will watch on a large screen or edit and crop the footage.")}
 
-${figure(
-  "quality-file-size-chart.png",
-  "Bar chart of one Dailymotion video's file size by quality: about 28 MB at 720p, 61 MB at 1080p, 136 MB at 1440p and 216 MB at 4K",
-  "File size grows quickly with resolution. Sizes are estimates listed by the platform.",
-  1200,
-  675,
-)}
+${figure(chartSvg(), "File size grows quickly with resolution. Sizes are estimates listed by the platform.")}
 
 ${h2("Why some files are MKV")}
 ${p("At higher quality, many platforms deliver the picture and the sound as separate files. Flux joins them with FFmpeg into one file. When the two parts use different codecs, MKV can hold them together without re-encoding, so nothing is lost. VLC, mpv and most modern players open MKV directly.")}
@@ -137,16 +123,13 @@ ${p(`Paste a public video link into ${a(site + "/", "Flux")}, check which qualit
   <div style="font-size:13px;color:#9899ad;margin-top:12px;">Free to book. No obligation.</div>
 </div>
 
-<p style="font-size:15px;color:#9899ad;margin:0;"><em>Flux is made by ${a("https://zubairhussain.xyz", "Zubair Hussain (zubairhussain.xyz)")}.</em></p>
-</div>
-`;
+<p style="font-size:15px;color:#9899ad;margin:0;"><em>Flux is made by ${a("https://zubairhussain.xyz", "Zubair Hussain (zubairhussain.xyz)")}.</em></p>`;
 
-const labels = "video quality, downloads, guides";
-const title = "Why a 4K video isn't always 4K: how Flux finds the real quality";
-const description =
-  "What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.";
+const card = (inner) =>
+  `<div style="font-family:${font};background:${c.bg};color:${c.text};border-radius:20px;padding:30px 28px;max-width:760px;margin:0 auto;">${inner}\n</div>`;
 
-const header = `<!--
+// --- Blogger paste version ----------------------------------------------------
+const bloggerHeader = `<!--
   FIRST BLOG POST for Blogger (generated by scripts/build-blog-post.mjs).
   1. Blogger, New post. Click the pen icon and choose "HTML view".
   2. Paste everything below the "PASTE FROM HERE" line.
@@ -155,23 +138,100 @@ const header = `<!--
   5. Post settings, Search description (${description.length} characters):
      ${description}
   6. Publish. It appears on the website's Blog page and in /llms.txt within about 5 minutes.
-  Images are served from ${site}/blog/ and need that website deployed.
+  The figures are inline SVG code, so no image files are needed.
+  Social preview: Blogger takes og:image from the first <img> in a post, and inline SVG is not one.
+  See first-post-full.html (and its og:image) and docs/BLOGGER.md for how to set the preview image.
 -->
 <!-- PASTE FROM HERE -->`;
 
-// Every image needs alt text and dimensions; refuse to write a post without them.
-for (const tag of post.match(/<img\b[^>]*>/g) || []) {
-  for (const attribute of ["alt", "width", "height"])
-    if (!new RegExp(`\\s${attribute}="[^"]+"`).test(tag))
-      throw new Error(`Image is missing ${attribute}: ${tag.slice(0, 80)}`);
+// --- Complete page with Open Graph data ----------------------------------------
+const json = (value) => JSON.stringify(value).replace(/</g, "\\u003c");
+const attr = (value) => value.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
+const author = {
+  "@type": "Person",
+  name: "Zubair Hussain",
+  url: "https://zubairhussain.xyz",
+};
+const schema = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: title,
+  description,
+  image: [ogImage],
+  datePublished: date,
+  dateModified: date,
+  inLanguage: "en",
+  author,
+  publisher: author,
+  keywords: labels,
+  ...(canonical ? { mainEntityOfPage: canonical } : {}),
+};
+const meta = [
+  `<meta charset="utf-8">`,
+  `<meta name="viewport" content="width=device-width, initial-scale=1">`,
+  `<title>${attr(title)}</title>`,
+  `<meta name="description" content="${attr(description)}">`,
+  `<meta name="author" content="Zubair Hussain">`,
+  ...(canonical ? [`<link rel="canonical" href="${canonical}">`] : []),
+  `<meta name="robots" content="index, follow, max-image-preview:large">`,
+  `<!-- Open Graph: Facebook, LinkedIn, WhatsApp, Discord, Slack -->`,
+  `<meta property="og:type" content="article">`,
+  `<meta property="og:site_name" content="Flux">`,
+  `<meta property="og:title" content="${attr(title)}">`,
+  `<meta property="og:description" content="${attr(description)}">`,
+  ...(canonical ? [`<meta property="og:url" content="${canonical}">`] : []),
+  `<meta property="og:image" content="${ogImage}">`,
+  `<meta property="og:image:secure_url" content="${ogImage}">`,
+  `<meta property="og:image:type" content="image/png">`,
+  `<meta property="og:image:width" content="1200">`,
+  `<meta property="og:image:height" content="630">`,
+  `<meta property="og:image:alt" content="${attr(ogAlt)}">`,
+  `<meta property="og:locale" content="en_US">`,
+  `<meta property="article:published_time" content="${date}">`,
+  `<meta property="article:author" content="https://zubairhussain.xyz">`,
+  `<meta property="article:tag" content="video quality">`,
+  `<meta property="article:tag" content="downloads">`,
+  `<!-- Twitter / X -->`,
+  `<meta name="twitter:card" content="summary_large_image">`,
+  `<meta name="twitter:title" content="${attr(title)}">`,
+  `<meta name="twitter:description" content="${attr(description)}">`,
+  `<meta name="twitter:image" content="${ogImage}">`,
+  `<meta name="twitter:image:alt" content="${attr(ogAlt)}">`,
+  `<script type="application/ld+json">${json(schema)}</script>`,
+].join("\n  ");
+
+const full = `<!doctype html>
+<html lang="en">
+<head>
+  ${meta}
+</head>
+<body style="margin:0;background:${c.bg};">
+<article style="padding:24px 16px;">
+${card(`\n<h1 style="font-size:40px;line-height:1.1;letter-spacing:-1.2px;color:${c.white};margin:0 0 22px;">${title}</h1>\n<p style="font-size:15px;color:#9899ad;margin:0 0 22px;">By ${a("https://zubairhussain.xyz", "Zubair Hussain")} · <time datetime="${date}">${date}</time></p>${content}`)}
+</article>
+</body>
+</html>
+`;
+
+// Every inline figure must have a text alternative; the OG image must be absolute https.
+for (const svg of full.match(/<svg\b[\s\S]*?<\/svg>/g) || []) {
+  if (!/role="img"/.test(svg) || !/<title id="[^"]+">[^<]+<\/title>/.test(svg))
+    throw new Error("An SVG figure is missing role=img or a title");
+  if (!/<desc id="[^"]+">[^<]+<\/desc>/.test(svg))
+    throw new Error("An SVG figure is missing a description");
 }
+if (!/^https:\/\//.test(ogImage)) throw new Error("og:image must be https");
 if (description.length > 160)
   throw new Error("Search description is longer than 160 characters");
 
-const file = path.resolve(import.meta.dirname, "../docs/blog/first-post.html");
-await writeFile(file, `${header}\n${post.trim()}\n`);
+const here = (file) => path.resolve(import.meta.dirname, "../docs/blog", file);
+await writeFile(
+  here("first-post.html"),
+  `${bloggerHeader}\n${card(content)}\n`,
+);
+await writeFile(here("first-post-full.html"), full);
 console.log(
-  `wrote docs/blog/first-post.html (schedule link: ${
+  `wrote docs/blog/first-post.html and first-post-full.html (schedule link: ${
     schedule === "SCHEDULE_LINK_HERE" ? "NOT SET YET" : schedule
   })`,
 );
