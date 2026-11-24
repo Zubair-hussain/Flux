@@ -3,21 +3,21 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Why a 4K video isn't always 4K: how Flux finds the real quality</title>
-  <meta name="description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <title>Why 4K Isn't Always 4K</title>
+  <meta name="description" content="Your 4K video may not be real 4K. See how Flux finds the true quality, with numbers from real tests.">
   <meta name="author" content="Zubair Hussain">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <!-- Open Graph: Facebook, LinkedIn, WhatsApp, Discord, Slack -->
   <meta property="og:type" content="article">
   <meta property="og:site_name" content="Flux">
-  <meta property="og:title" content="Why a 4K video isn't always 4K: how Flux finds the real quality">
-  <meta property="og:description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <meta property="og:title" content="Why 4K Isn't Always 4K">
+  <meta property="og:description" content="Your 4K video may not be real 4K. See how Flux finds the true quality, with numbers from real tests.">
   <meta property="og:image" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
   <meta property="og:image:secure_url" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
   <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K">
+  <meta property="og:image:alt" content="Flux banner reading: Why 4K isn't always 4K. Your 4K video may not be real 4K, with quality chips for 720p, 1080p, 4K and 8K">
   <meta property="og:locale" content="en_US">
   <meta property="article:published_time" content="2026-11-24">
   <meta property="article:author" content="https://zubairhussain.xyz">
@@ -25,24 +25,24 @@
   <meta property="article:tag" content="downloads">
   <!-- Twitter / X -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Why a 4K video isn't always 4K: how Flux finds the real quality">
-  <meta name="twitter:description" content="What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.">
+  <meta name="twitter:title" content="Why 4K Isn't Always 4K">
+  <meta name="twitter:description" content="Your 4K video may not be real 4K. See how Flux finds the true quality, with numbers from real tests.">
   <meta name="twitter:image" content="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png">
-  <meta name="twitter:image:alt" content="Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K 8K">
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why a 4K video isn't always 4K: how Flux finds the real quality","description":"What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.","image":["https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png"],"datePublished":"2026-11-24","dateModified":"2026-11-24","inLanguage":"en","author":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"publisher":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"keywords":"video quality, downloads, guides"}</script>
+  <meta name="twitter:image:alt" content="Flux banner reading: Why 4K isn't always 4K. Your 4K video may not be real 4K, with quality chips for 720p, 1080p, 4K and 8K">
+  <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Why 4K Isn't Always 4K","description":"Your 4K video may not be real 4K. See how Flux finds the true quality, with numbers from real tests.","image":["https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png"],"datePublished":"2026-11-24","dateModified":"2026-11-24","inLanguage":"en","author":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"publisher":{"@type":"Person","name":"Zubair Hussain","url":"https://zubairhussain.xyz"},"keywords":"video quality, 4K vs 1080p, video downloader, Flux"}</script>
 </head>
 <body style="margin:0;background:#101116;">
 <article style="padding:24px 16px;">
 <div style="font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:#101116;color:#c9c5da;border-radius:20px;padding:30px 28px;max-width:760px;margin:0 auto;">
-<h1 style="font-size:40px;line-height:1.1;letter-spacing:-1.2px;color:#f3f2fa;margin:0 0 22px;">Why a 4K video isn't always 4K: how Flux finds the real quality</h1>
+<h1 style="font-size:40px;line-height:1.1;letter-spacing:-1.2px;color:#f3f2fa;margin:0 0 22px;">Why 4K Isn't Always 4K</h1>
 <p style="font-size:15px;color:#9899ad;margin:0 0 22px;">By <a href="https://zubairhussain.xyz" style="color:#c6a8ff;text-decoration:underline;">Zubair Hussain</a> · <time datetime="2026-11-24">2026-11-24</time></p>
 <p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice the numbers can mislead. This guide explains how <a href="https://flux.detroonshah.workers.dev/" style="color:#c6a8ff;text-decoration:underline;">Flux</a> decides what to offer, using results from our own tests in November 2026.</p>
 
 
 <figure style="margin:26px 0;">
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="fx-hero-t fx-hero-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
-  <title id="fx-hero-t">Why a 4K video isn't always 4K</title>
-  <desc id="fx-hero-d">Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K.</desc>
+  <title id="fx-hero-t">Why 4K isn't always 4K</title>
+  <desc id="fx-hero-d">Flux banner reading: Why 4K isn't always 4K. Your 4K video may not be real 4K, with quality chips for 720p, 1080p, 4K and 8K.</desc>
   <defs>
     <linearGradient id="fx-hero-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
     <linearGradient id="fx-hero-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
@@ -62,10 +62,9 @@
   <g><rect x="866" y="54" width="110" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="921" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">1080p</text></g>
   <g><rect x="988" y="54" width="68" height="44" rx="22" fill="url(#fx-hero-accent)" stroke="none"/><text x="1022" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#17102b">4K</text></g>
   <g><rect x="1068" y="54" width="68" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="1102" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">8K</text></g>
-  <text x="64" y="240" font-size="84" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why a 4K video isn't</text>
-  <text x="64" y="330" font-size="84" font-weight="800" fill="url(#fx-hero-accent)" letter-spacing="-3">always 4K</text>
-  <text x="64" y="410" font-size="30" fill="#c9c5da">How Flux finds the real quality of a video,</text>
-  <text x="64" y="452" font-size="30" fill="#c9c5da">with numbers from real tests.</text>
+  <text x="64" y="272" font-size="150" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why 4K</text>
+  <text x="64" y="418" font-size="150" font-weight="800" fill="url(#fx-hero-accent)" letter-spacing="-3">isn't always 4K</text>
+  <text x="64" y="500" font-size="38" font-weight="500" fill="#c9c5da">Your 4K video may not be real 4K.</text>
   <text x="64" y="585" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>
 </svg>
   <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">How Flux finds the real quality of a video.</figcaption>
