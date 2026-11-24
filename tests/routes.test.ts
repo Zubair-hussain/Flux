@@ -100,7 +100,7 @@ it("returns bounded operator diagnostics for a failed extractor", async () => {
   );
   const data = await response.json();
   expect(data.ok).toBe(false);
-  expect(data.stderr).toHaveLength(4000);
+  expect(data.stderr).toHaveLength(1500);
   expect(response.headers.get("cache-control")).toBe("no-store");
 });
 

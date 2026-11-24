@@ -3,6 +3,11 @@ import { backendCapacity } from "@/lib/engine";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 import { ytdlpCommand } from "@/lib/ytdlp";
+
+const diagnosticTargets: Record<string, string> = {
+  youtube: "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+  dailymotion: "https://www.dailymotion.com/video/xbxi4vu",
+};
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
@@ -15,16 +20,18 @@ export async function GET(request: Request) {
     secret &&
     Buffer.byteLength(secret) === Buffer.byteLength(supplied) &&
     timingSafeEqual(Buffer.from(secret), Buffer.from(supplied));
+  const diagnostic = new URL(request.url).searchParams.get("diagnostic");
   if (
     authorized &&
-    new URL(request.url).searchParams.get("diagnostic") === "youtube"
+    diagnostic &&
+    Object.hasOwn(diagnosticTargets, diagnostic)
   ) {
-    // Operator-only, fixed public test video. Never accept executable arguments or URLs.
+    // Operator-only, fixed public test videos. Never accept URLs or free-form arguments.
     const command = ytdlpCommand([
       "--skip-download",
       "--dump-single-json",
       "--",
-      "https://www.youtube.com/watch?v=aqz-KE-bpKQ",
+      diagnosticTargets[diagnostic],
     ]);
     try {
       const result = await promisify(execFile)(command.binary, command.args, {
@@ -37,6 +44,7 @@ export async function GET(request: Request) {
         {
           ok: true,
           revision: process.env.RENDER_GIT_COMMIT,
+          target: diagnostic,
           title: info.title,
           formats: info.formats?.length,
         },
@@ -52,9 +60,10 @@ export async function GET(request: Request) {
         {
           ok: false,
           revision: process.env.RENDER_GIT_COMMIT,
+          target: diagnostic,
           code: detail.code,
           signal: detail.signal,
-          stderr: String(detail.stderr || "").slice(-4000),
+          stderr: String(detail.stderr || "").slice(-1500),
         },
         { headers: { "Cache-Control": "no-store" } },
       );
