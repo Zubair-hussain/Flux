@@ -1,6 +1,15 @@
-import { access, mkdir, writeFile, copyFile } from "node:fs/promises";
+import {
+  access,
+  mkdir,
+  readFile,
+  writeFile as writeRaw,
+  copyFile,
+} from "node:fs/promises";
 import path from "node:path";
 import { createRequire } from "node:module";
+
+const writeFile = (file, content) =>
+  writeRaw(file, content.replace(/[ \t]+$/gm, "").trimEnd() + "\n");
 
 // Original vector artwork and seekable HyperFrames source. No downloaded art.
 const project = path.resolve("videos/wildlife-wait");
@@ -16,6 +25,7 @@ if (process.env.FLUX_GSAP_SOURCE) {
     await copyFile(require.resolve("gsap/dist/gsap.min.js"), gsapTarget);
   });
 }
+await writeFile(gsapTarget, await readFile(gsapTarget, "utf8"));
 
 const c = {
   ink: "#171722",
