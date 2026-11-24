@@ -7,16 +7,44 @@
   5. Post settings, Search description (135 characters):
      What video quality really means, why Flux never upscales, and why 4K files are so much bigger than 1080p, with numbers from real tests.
   6. Publish. It appears on the website's Blog page and in /llms.txt within about 5 minutes.
-  Images are served from https://flux.detroonshah.workers.dev/blog/ and need that website deployed.
+  The figures are inline SVG code, so no image files are needed.
+  Social preview: Blogger takes og:image from the first <img> in a post, and inline SVG is not one.
+  See first-post-full.html (and its og:image) and docs/BLOGGER.md for how to set the preview image.
 -->
 <!-- PASTE FROM HERE -->
 <div style="font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;background:#101116;color:#c9c5da;border-radius:20px;padding:30px 28px;max-width:760px;margin:0 auto;">
-
 <p style="font-size:17px;line-height:1.75;margin:0 0 16px;color:#c9c5da;">When you save a video, the quality menu looks simple: 720p, 1080p, 4K. In practice the numbers can mislead. This guide explains how <a href="https://flux.detroonshah.workers.dev/" style="color:#c6a8ff;text-decoration:underline;">Flux</a> decides what to offer, using results from our own tests in November 2026.</p>
 
 
 <figure style="margin:26px 0;">
-  <img src="https://flux.detroonshah.workers.dev/blog/why-4k-is-not-always-4k-hero.png" alt="Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K" width="1200" height="630" fetchpriority="high" decoding="async" style="width:100%;height:auto;display:block;border-radius:14px;border:1px solid #2a2b36;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-labelledby="fx-hero-t fx-hero-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-hero-t">Why a 4K video isn't always 4K</title>
+  <desc id="fx-hero-d">Flux banner reading: Why a 4K video isn't always 4K, with quality chips for 720p, 1080p, 4K and 8K.</desc>
+  <defs>
+    <linearGradient id="fx-hero-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-hero-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-hero-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-hero-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#101116"/>
+  <rect width="1200" height="630" fill="url(#fx-hero-glow1)"/>
+  <rect width="1200" height="630" fill="url(#fx-hero-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-hero-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <g><rect x="758" y="54" width="96" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="806" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">720p</text></g>
+  <g><rect x="866" y="54" width="110" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="921" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">1080p</text></g>
+  <g><rect x="988" y="54" width="68" height="44" rx="22" fill="url(#fx-hero-accent)" stroke="none"/><text x="1022" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#17102b">4K</text></g>
+  <g><rect x="1068" y="54" width="68" height="44" rx="22" fill="#17161f" stroke="#3a3247"/><text x="1102" y="83" font-size="22" font-weight="700" text-anchor="middle" fill="#d9cffa">8K</text></g>
+  <text x="64" y="240" font-size="84" font-weight="800" fill="#f3f2fa" letter-spacing="-3">Why a 4K video isn't</text>
+  <text x="64" y="330" font-size="84" font-weight="800" fill="url(#fx-hero-accent)" letter-spacing="-3">always 4K</text>
+  <text x="64" y="410" font-size="30" fill="#c9c5da">How Flux finds the real quality of a video,</text>
+  <text x="64" y="452" font-size="30" fill="#c9c5da">with numbers from real tests.</text>
+  <text x="64" y="585" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>
+</svg>
   <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">How Flux finds the real quality of a video.</figcaption>
 </figure>
 
@@ -34,7 +62,36 @@
 
 
 <figure style="margin:26px 0;">
-  <img src="https://flux.detroonshah.workers.dev/blog/vertical-video-quality.png" alt="Diagram of a tall phone video measuring 720 pixels wide by 1280 pixels high, labelled as a 720p source because quality is counted by the short side" width="1200" height="675" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;border-radius:14px;border:1px solid #2a2b36;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="fx-vertical-t fx-vertical-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-vertical-t">Tall videos count by the short side</title>
+  <desc id="fx-vertical-d">Diagram of a tall phone video measuring 720 pixels wide by 1280 pixels high, labelled as a 720p source because quality is counted by the short side.</desc>
+  <defs>
+    <linearGradient id="fx-vertical-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-vertical-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-vertical-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-vertical-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#101116"/>
+  <rect width="1200" height="675" fill="url(#fx-vertical-glow1)"/>
+  <rect width="1200" height="675" fill="url(#fx-vertical-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-vertical-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <text x="64" y="178" font-size="52" font-weight="800" fill="#f3f2fa" letter-spacing="-1.5">Tall videos count by</text>
+  <text x="64" y="236" font-size="52" font-weight="800" fill="url(#fx-vertical-accent)" letter-spacing="-1.5">the short side</text>
+  <text x="64" y="300" font-size="26" fill="#c9c5da">A phone clip measuring 720×1280 is a 720p</text>
+  <text x="64" y="336" font-size="26" fill="#c9c5da">source. Calling it "1280p" would promise</text>
+  <text x="64" y="372" font-size="26" fill="#c9c5da">detail the video does not have.</text>
+  <rect x="740" y="56" width="270" height="480" rx="30" fill="#1d1830" stroke="#9873ff" stroke-width="2"/>
+  <text x="875" y="318" font-size="46" font-weight="800" text-anchor="middle" fill="url(#fx-vertical-accent)">720p</text>
+  <line x1="740" y1="560" x2="1010" y2="560" stroke="#c7b3ff" stroke-width="3"/>
+  <text x="875" y="598" font-size="28" font-weight="800" text-anchor="middle" fill="#c7b3ff">720 px</text>
+  <text x="1056" y="296" font-size="26" font-weight="700" text-anchor="middle" fill="#9899ad" transform="rotate(90 1056 296)">1280 px (long side)</text>
+  <text x="64" y="628" font-size="22" fill="#9899ad">By Zubair Hussain · zubairhussain.xyz</text>
+</svg>
   <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">A 720&times;1280 clip is a 720p source.</figcaption>
 </figure>
 
@@ -47,7 +104,52 @@
 
 
 <figure style="margin:26px 0;">
-  <img src="https://flux.detroonshah.workers.dev/blog/quality-file-size-chart.png" alt="Bar chart of one Dailymotion video's file size by quality: about 28 MB at 720p, 61 MB at 1080p, 136 MB at 1440p and 216 MB at 4K" width="1200" height="675" loading="lazy" decoding="async" style="width:100%;height:auto;display:block;border-radius:14px;border:1px solid #2a2b36;">
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" width="1200" height="675" role="img" aria-labelledby="fx-chart-t fx-chart-d" style="display:block;width:100%;height:auto;border-radius:14px;border:1px solid #2a2b36;font-family:'DM Sans','Segoe UI',system-ui,-apple-system,Arial,sans-serif;">
+  <title id="fx-chart-t">File size by quality for one video</title>
+  <desc id="fx-chart-d">Bar chart of one Dailymotion video's file size by quality: about 28 MB at 720p, 61 MB at 1080p, 136 MB at 1440p and 216 MB at 4K.</desc>
+  <defs>
+    <linearGradient id="fx-chart-accent" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#c7b3ff"/><stop offset="1" stop-color="#9873ff"/></linearGradient>
+    <linearGradient id="fx-chart-bar" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#9873ff"/><stop offset="1" stop-color="#c7b3ff"/></linearGradient>
+    <radialGradient id="fx-chart-glow1" cx="0.85" cy="0" r="0.7"><stop offset="0" stop-color="#3a2a66"/><stop offset="1" stop-color="#3a2a66" stop-opacity="0"/></radialGradient>
+    <radialGradient id="fx-chart-glow2" cx="0" cy="1" r="0.6"><stop offset="0" stop-color="#2a1f4d"/><stop offset="1" stop-color="#2a1f4d" stop-opacity="0"/></radialGradient>
+  </defs>
+  <rect width="1200" height="675" fill="#101116"/>
+  <rect width="1200" height="675" fill="url(#fx-chart-glow1)"/>
+  <rect width="1200" height="675" fill="url(#fx-chart-glow2)"/>
+  <g>
+    <rect x="64" y="52" width="46" height="46" rx="13" fill="url(#fx-chart-accent)"/>
+    <rect x="80" y="68" width="14" height="14" rx="3" fill="none" stroke="#17102b" stroke-width="4" transform="rotate(45 87 75)"/>
+    <text x="124" y="87" font-size="34" font-weight="800" fill="#f3f2fa" letter-spacing="-0.5">flux<tspan fill="#ad91ff">.</tspan></text>
+  </g>
+  
+  <text x="64" y="176" font-size="52" font-weight="800" fill="#f3f2fa" letter-spacing="-1.5">Same video, <tspan fill="url(#fx-chart-accent)">four sizes</tspan></text>
+  <text x="64" y="218" font-size="24" fill="#9899ad">4K is about 3.5 times larger than 1080p. One Dailymotion sample, November 2026.</text>
+  <g>
+    <text x="64" y="295" font-size="32" font-weight="800" fill="#f3f2fa">720p</text>
+    <rect x="206" y="262" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="262" width="98.8" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="295" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~28 MB</text>
+  </g>
+  <g>
+    <text x="64" y="363" font-size="32" font-weight="800" fill="#f3f2fa">1080p</text>
+    <rect x="206" y="330" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="330" width="212.6" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="363" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~61 MB</text>
+  </g>
+  <g>
+    <text x="64" y="431" font-size="32" font-weight="800" fill="#f3f2fa">1440p</text>
+    <rect x="206" y="398" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="398" width="476.4" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="431" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~136 MB</text>
+  </g>
+  <g>
+    <text x="64" y="499" font-size="32" font-weight="800" fill="#f3f2fa">4K</text>
+    <rect x="206" y="466" width="758" height="46" rx="12" fill="#191a22" stroke="#2a2b36"/>
+    <rect x="206" y="466" width="758.0" height="46" rx="11" fill="url(#fx-chart-bar)"/>
+    <text x="1136" y="499" font-size="30" font-weight="700" text-anchor="end" fill="#d9cffa">~216 MB</text>
+  </g>
+  <text x="64" y="628" font-size="22" fill="#9899ad">Sizes are estimates listed by the platform · flux.detroonshah.workers.dev</text>
+</svg>
   <figcaption style="font-size:14px;color:#9899ad;margin-top:8px;text-align:center;">File size grows quickly with resolution. Sizes are estimates listed by the platform.</figcaption>
 </figure>
 
