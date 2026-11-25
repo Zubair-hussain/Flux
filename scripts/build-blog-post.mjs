@@ -14,10 +14,7 @@ const option = (name, fallback) => {
   const i = args.indexOf(`--${name}`);
   return i >= 0 && args[i + 1] ? args[i + 1] : fallback;
 };
-const site = option("site", "https://flux.detroonshah.workers.dev").replace(
-  /\/$/,
-  "",
-);
+const site = option("site", "https://flexdow.xyz").replace(/\/$/, "");
 const schedule = option("schedule", "SCHEDULE_LINK_HERE");
 const canonical = option("canonical", "");
 const date = option("date", new Date().toISOString().slice(0, 10));
