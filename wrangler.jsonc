@@ -10,6 +10,11 @@
   },
   "observability": { "enabled": true },
   "workers_dev": true,
+  // Custom domain (zone flexdow.xyz is on this Cloudflare account).
+  "routes": [
+    { "pattern": "flexdow.xyz", "custom_domain": true },
+    { "pattern": "www.flexdow.xyz", "custom_domain": true },
+  ],
   "preview_urls": false,
   // Runtime values for server-rendered routes (ads.txt, robots.txt, sitemap).
   // Static pages read the same variables at build time: see cf-deploy.yml.
@@ -17,8 +22,11 @@
     "FLUX_PUBLIC_SITE": "true",
     "FLUX_ROUTER": "true",
     "FLUX_BACKENDS": "{\"backend-1\":\"https://flux-qxb8.onrender.com\",\"backend-2\":\"https://flux-l5qr.onrender.com\"}",
-    "SITE_URL": "https://flux.detroonshah.workers.dev",
-    // Keep false until a custom domain is attached (avoids indexing workers.dev).
-    "SEO_INDEXABLE": "false",
+    "SITE_URL": "https://flexdow.xyz",
+    "SEO_INDEXABLE": "true",
+    // Google AdSense. Set up Google's consent message (AdSense > Privacy & messaging).
+    "ADSENSE_CLIENT_ID": "ca-pub-4022149996537615",
+    "ADSENSE_ENABLED": "true",
+    "ADSENSE_CONSENT_READY": "true",
   },
 }
