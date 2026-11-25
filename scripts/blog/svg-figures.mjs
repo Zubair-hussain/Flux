@@ -114,7 +114,7 @@ export function chartSvg() {
   <text x="64" y="176" font-size="52" font-weight="800" fill="#f3f2fa" letter-spacing="-1.5">Same video, <tspan fill="url(#${id}-accent)">four sizes</tspan></text>
   <text x="64" y="218" font-size="24" fill="#9899ad">4K is about 3.5 times larger than 1080p. One Dailymotion sample, November 2026.</text>
   ${rows}
-  <text x="64" y="628" font-size="22" fill="#9899ad">Sizes are estimates listed by the platform · flux.detroonshah.workers.dev</text>`,
+  <text x="64" y="628" font-size="22" fill="#9899ad">Sizes are estimates listed by the platform · flexdow.xyz</text>`,
   });
 }
 
