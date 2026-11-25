@@ -95,7 +95,7 @@ const images = [
             )
             .join("")}
         </div>
-        <div class="site">Sizes are estimates listed by the platform · flux.detroonshah.workers.dev</div>
+        <div class="site">Sizes are estimates listed by the platform · flexdow.xyz</div>
       </div>`;
     })(),
   },
