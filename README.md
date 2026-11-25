@@ -59,7 +59,7 @@ Paste a public link, Flux reads the real source resolutions, you pick a quality,
 
 ## One-command CLI
 
-Download [flux.mjs](https://flux.detroonshah.workers.dev/downloads/flux.mjs) to a folder and open PowerShell (Windows) or Terminal (macOS/Linux) there. The bundled CLI has no npm runtime dependencies; Node.js 22+, yt-dlp, and FFmpeg must be installed. Source availability varies by platform.
+Download [flux.mjs](https://flexdow.xyz/downloads/flux.mjs) to a folder and open PowerShell (Windows) or Terminal (macOS/Linux) there. The bundled CLI has no npm runtime dependencies; Node.js 22+, yt-dlp, and FFmpeg must be installed. Source availability varies by platform.
 
 ```bash
 node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ'          # best available quality
@@ -70,10 +70,10 @@ node ./flux.mjs doctor                                # check prerequisites
 
 The public website uses this direct download instead of depending on an npm release. From this repository, run `npm run build:cli` and `node packages/cli/dist/flux.mjs <url>`. Builds also copy the CLI and license files into the website's public downloads folder. Bare package-name installation requires a verified npm registry release; the direct archive below does not.
 
-You can also use the installable [npm tarball](https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz) without a registry publication:
+You can also use the installable [npm tarball](https://flexdow.xyz/downloads/flux-downloader-1.0.0.tgz) without a registry publication:
 
 ```powershell
-npx --yes --package=https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz flux doctor
+npx --yes --package=https://flexdow.xyz/downloads/flux-downloader-1.0.0.tgz flux doctor
 # Or download the .tgz file and install it globally:
 npm install -g ./flux-downloader-1.0.0.tgz
 flux --version
@@ -149,7 +149,7 @@ The website can offer a real download box next to the command-line option. It ne
 
 ## Deploy (Cloudflare)
 
-The public website runs on Cloudflare Workers: https://flux.detroonshah.workers.dev. Media processing runs on the visitor's computer, so the hosted homepage provides a downloadable CLI and a `node ./flux.mjs` command. `npm run cf:deploy` deploys, and [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) does it on every push to `_prod` once the Cloudflare secrets are added. Setup details and going-public steps are in [docs/SEO-AND-HOSTING.md](docs/SEO-AND-HOSTING.md).
+The public website runs on Cloudflare Workers: https://flexdow.xyz. Media processing runs on the visitor's computer, so the hosted homepage provides a downloadable CLI and a `node ./flux.mjs` command. `npm run cf:deploy` deploys, and [deploy-cloudflare.yml](.github/workflows/deploy-cloudflare.yml) does it on every push to `_prod` once the Cloudflare secrets are added. Setup details and going-public steps are in [docs/SEO-AND-HOSTING.md](docs/SEO-AND-HOSTING.md).
 
 ## Checks
 
