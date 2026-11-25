@@ -21,8 +21,11 @@ jobs:
       FLUX_PUBLIC_SITE: "true"
       FLUX_ROUTER: ${{ vars.FLUX_ROUTER || 'false' }}
       NEXT_PUBLIC_TURNSTILE_SITE_KEY: ${{ vars.NEXT_PUBLIC_TURNSTILE_SITE_KEY }}
-      SITE_URL: ${{ vars.FLUX_PUBLIC_URL || 'https://flux.detroonshah.workers.dev' }}
-      SEO_INDEXABLE: ${{ vars.SEO_INDEXABLE || 'false' }}
+      SITE_URL: ${{ vars.FLUX_PUBLIC_URL || 'https://flexdow.xyz' }}
+      SEO_INDEXABLE: ${{ vars.SEO_INDEXABLE || 'true' }}
+      ADSENSE_CLIENT_ID: ca-pub-4022149996537615
+      ADSENSE_ENABLED: "true"
+      ADSENSE_CONSENT_READY: "true"
     steps:
       - name: Check Cloudflare credentials
         id: creds
