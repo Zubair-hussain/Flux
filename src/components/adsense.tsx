@@ -1,15 +1,14 @@
-import Script from "next/script";
 import { adsConfig, adSlotId, type AdPlacement } from "@/lib/ads";
 import { AdPush } from "@/components/ad-push";
 
 export function AdSense() {
   const { enabled, client } = adsConfig();
   if (!enabled) return null;
+  // A plain script in <head>, as Google asks, so the AdSense site check can find it.
   return (
-    <Script
-      id="flux-adsense"
+    // eslint-disable-next-line @next/next/no-sync-scripts
+    <script
       async
-      strategy="lazyOnload"
       crossOrigin="anonymous"
       src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${client}`}
     />
