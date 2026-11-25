@@ -9,9 +9,9 @@ afterEach(() => {
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
-it("keeps unconfigured previews out of search and gives each page metadata", () => {
+it("keeps unconfigured previews out of search and gives each page metadata", async () => {
   expect(publicReady).toBe(false);
-  expect(sitemap()).toEqual([]);
+  expect(await sitemap()).toEqual([]);
   const rules = robots().rules as { userAgent: string | string[] }[];
   expect(rules.at(-1)).toEqual({ userAgent: "*", disallow: "/" });
   // AI crawlers stay allowed even while search engines are held back.
