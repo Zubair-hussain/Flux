@@ -34,7 +34,7 @@ npx wrangler secret put BLOGGER_API_KEY --name flux
 ## 4. Check it
 
 1. Publish (or keep) at least one live post on your Blogger blog.
-2. Open `https://flux.detroonshah.workers.dev/blog` and `https://flux.detroonshah.workers.dev/llms.txt`.
+2. Open `https://flexdow.xyz/blog` and `https://flexdow.xyz/llms.txt`.
 3. Your article titles should be listed. The next time you publish, the lists update by themselves after about 5 minutes.
 
 If the list stays empty: check the blog is public and has a live post, the API key is restricted to Blogger API v3 (not another API), and both secrets were set on the Worker named `flux`.
