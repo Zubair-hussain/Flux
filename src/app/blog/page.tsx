@@ -1,5 +1,7 @@
 import { ContentPage } from "@/components/content-page";
+import Link from "next/link";
 import { bloggerPosts } from "@/lib/blogger";
+import { postSlug } from "@/lib/blogger-article";
 import { creator, pageMetadata, siteUrl } from "@/lib/site";
 // Read Blogger on each request so new articles appear without a redeploy.
 export const dynamic = "force-dynamic";
@@ -21,7 +23,7 @@ export default async function Blog() {
     blogPost: posts.map((post) => ({
       "@type": "BlogPosting",
       headline: post.title,
-      url: post.url,
+      url: new URL(`/blog/${postSlug(post.url)}`, siteUrl).href,
       ...(post.published ? { datePublished: post.published } : {}),
       author: { "@type": "Person", name: creator.name, url: creator.url },
     })),
@@ -33,16 +35,14 @@ export default async function Blog() {
       path="/blog"
     >
       <section>
-        <h2>From our Blogger publication</h2>
+        <h2>Latest articles</h2>
         {posts.length ? (
           posts.map((post) => (
             <article key={post.url}>
               <h3>
-                <a href={post.url} rel="noopener noreferrer">
-                  {post.title}
-                </a>
+                <Link href={`/blog/${postSlug(post.url)}`}>{post.title}</Link>
               </h3>
-              <p>Read the original article on our publication.</p>
+              <p>Read the article.</p>
             </article>
           ))
         ) : (
