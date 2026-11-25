@@ -3,6 +3,7 @@
 // from the same page copy and Blogger posts the website shows, so they stay
 // current without anyone editing a file.
 import type { BloggerPost } from "./blogger";
+import { postSlug } from "./blogger-article";
 import { pages } from "./editorial";
 import { platforms } from "./platforms";
 import { creator, repositoryUrl, siteUrl } from "./site";
@@ -18,11 +19,11 @@ const text = (value: string) =>
 const day = (iso?: string) => (iso ? iso.slice(0, 10) : "");
 const absolute = (path: string, base: string) => new URL(path, base).href;
 
-function postLines(posts: BloggerPost[]) {
+function postLines(posts: BloggerPost[], base: string) {
   return posts.length
     ? posts.map(
         (post) =>
-          `- [${text(post.title)}](${post.url})${post.published ? `: published ${day(post.published)}` : ""}`,
+          `- [${text(post.title)}](${absolute(`/blog/${postSlug(post.url)}`, base)})${post.published ? `: published ${day(post.published)}` : ""}`,
       )
     : ["- No articles have been published yet."];
 }
@@ -49,7 +50,7 @@ export function buildLlmsTxt(posts: BloggerPost[], base = siteUrl) {
     "",
     "## Latest blog articles",
     "",
-    ...postLines(posts),
+    ...postLines(posts, base),
     "",
     "## Policies",
     "",
@@ -97,7 +98,7 @@ export function buildLlmsFull(posts: BloggerPost[], base = siteUrl) {
     "",
     "## Latest blog articles",
     "",
-    ...postLines(posts),
+    ...postLines(posts, base),
     "",
     ...sections,
   ].join("\n");
