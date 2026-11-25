@@ -4,7 +4,7 @@ This checkout remains a local Node downloader. Static editorial pages can be ser
 
 ## Live deployment (Cloudflare Workers)
 
-The public website is deployed with OpenNext to Cloudflare Workers at https://flux.detroonshah.workers.dev. Because Workers cannot run Python, yt-dlp or FFmpeg, the hosted site runs in **public-site mode** (`FLUX_PUBLIC_SITE=true`): the homepage builds a ready-to-run `npx flux-downloader` command instead of downloading, and the API routes keep refusing non-local requests. Videos are saved on the visitor's own device.
+The public website is deployed with OpenNext to Cloudflare Workers at https://flexdow.xyz. Because Workers cannot run Python, yt-dlp or FFmpeg, the hosted site runs in **public-site mode** (`FLUX_PUBLIC_SITE=true`): the homepage builds a ready-to-run `npx flux-downloader` command instead of downloading, and the API routes keep refusing non-local requests. Videos are saved on the visitor's own device.
 
 ```powershell
 npm run cf:preview     # build and run in Cloudflare's runtime locally
