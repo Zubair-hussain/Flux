@@ -40,7 +40,7 @@ it("describes each article with its date and the author", async () => {
     {
       "@type": "BlogPosting",
       headline: "Why 4K </script> isn't 4K",
-      url: "https://x.blogspot.com/a",
+      url: "http://localhost:3000/blog/a",
       datePublished: "2026-11-24T10:00:00+05:00",
       author: {
         "@type": "Person",
