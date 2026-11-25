@@ -1,5 +1,5 @@
 import { readFile, mkdir, writeFile } from "node:fs/promises";
-const base = process.argv[2] || "https://flux.detroonshah.workers.dev";
+const base = process.argv[2] || "https://flexdow.xyz";
 const results = [];
 async function check(path, body) {
   const start = performance.now();
