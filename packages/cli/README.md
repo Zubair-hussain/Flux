@@ -6,12 +6,12 @@
 node ./flux.mjs 'https://youtu.be/aqz-KE-bpKQ'
 ```
 
-First download [flux.mjs](https://flux.detroonshah.workers.dev/downloads/flux.mjs) and open PowerShell or Terminal in that folder. This works without an npm release. Run `node ./flux.mjs doctor` to check prerequisites.
+First download [flux.mjs](https://flexdow.xyz/downloads/flux.mjs) and open PowerShell or Terminal in that folder. This works without an npm release. Run `node ./flux.mjs doctor` to check prerequisites.
 
 For npm installation before a registry release, use the hosted package:
 
 ```bash
-npx --yes --package=https://flux.detroonshah.workers.dev/downloads/flux-downloader-1.0.0.tgz flux doctor
+npx --yes --package=https://flexdow.xyz/downloads/flux-downloader-1.0.0.tgz flux doctor
 ```
 
 The following npm installation is only available after a verified npm publication:
