@@ -35,9 +35,9 @@ export default function RootLayout({
     <html lang="en" className={`${dmSans.variable} ${manrope.variable}`}>
       <head>
         <link rel="describedby" href="/llms.txt" type="text/plain" />
+        <AdSense />
       </head>
       <body>
-        <AdSense />
         {children}
         <nav className="public-links" aria-label="Resources and policies">
           <Link href="/blog">Blog</Link>
