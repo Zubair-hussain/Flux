@@ -12,7 +12,14 @@ afterEach(() => {
 it("keeps unconfigured previews out of search and gives each page metadata", () => {
   expect(publicReady).toBe(false);
   expect(sitemap()).toEqual([]);
-  expect(robots().rules).toEqual({ userAgent: "*", disallow: "/" });
+  const rules = robots().rules as { userAgent: string | string[] }[];
+  expect(rules.at(-1)).toEqual({ userAgent: "*", disallow: "/" });
+  // AI crawlers stay allowed even while search engines are held back.
+  const ai = rules.find((rule) => Array.isArray(rule.userAgent));
+  expect(ai).toMatchObject({ allow: "/", disallow: ["/api/"] });
+  expect(ai?.userAgent).toEqual(
+    expect.arrayContaining(["GPTBot", "ClaudeBot", "PerplexityBot"]),
+  );
   for (const [slug, page] of Object.entries(pages)) {
     const meta = pageMetadata(page.title, page.description, `/${slug}`);
     expect(meta.title).toContain(page.title);
