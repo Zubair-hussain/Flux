@@ -36,10 +36,11 @@ it("says who made the site, in the guide and in every page's metadata", () => {
 it("lists blog articles with safe link text and the publish day", () => {
   const guide = buildLlmsTxt(posts, base);
   expect(guide).toContain(
-    "- [How to pick a quality for video](https://zubair.blogspot.com/2026/11/quality.html): published 2026-11-22",
+    `- [How to pick a quality for video](${base}/blog/quality): published 2026-11-22`,
   );
   expect(guide).toContain(
-    "- [Older guide](https://zubair.blogspot.com/2026/10/old.html)\n",
+    `- [Older guide](${base}/blog/old)
+`,
   );
   expect(guide).toContain(`[Blog](${base}/blog)`);
   expect(guide).toContain(`${base}/llms-full.txt`);
