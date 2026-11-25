@@ -62,14 +62,14 @@ Then redeploy the website (push to `_prod`, or `npm run cf:deploy`).
 
 **On GitHub** (Settings, Secrets and variables, Actions), for the website's automatic deploys:
 
-| Kind     | Name                             | Value                                                                  |
-| -------- | -------------------------------- | ---------------------------------------------------------------------- |
-| Secret   | `CLOUDFLARE_API_TOKEN`           | Cloudflare token with permission to edit Workers                       |
-| Secret   | `CLOUDFLARE_ACCOUNT_ID`          | Your Cloudflare account ID                                             |
-| Variable | `FLUX_ROUTER`                    | `true`                                                                 |
-| Variable | `FLUX_PUBLIC_URL`                | The website's address (`https://flux.detroonshah.workers.dev` for now) |
-| Variable | `SEO_INDEXABLE`                  | `false` until your own domain is live                                  |
-| Variable | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Only if you use Turnstile                                              |
+| Kind     | Name                             | Value                                            |
+| -------- | -------------------------------- | ------------------------------------------------ |
+| Secret   | `CLOUDFLARE_API_TOKEN`           | Cloudflare token with permission to edit Workers |
+| Secret   | `CLOUDFLARE_ACCOUNT_ID`          | Your Cloudflare account ID                       |
+| Variable | `FLUX_ROUTER`                    | `true`                                           |
+| Variable | `FLUX_PUBLIC_URL`                | The website's address (`https://flexdow.xyz`)    |
+| Variable | `SEO_INDEXABLE`                  | `false` until your own domain is live            |
+| Variable | `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | Only if you use Turnstile                        |
 
 Never put these values in a file in the repository. The full list of settings, with notes, is in [.env.example](../.env.example).
 
