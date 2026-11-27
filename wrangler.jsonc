@@ -1,13 +1,15 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "flux",
-  "main": ".open-next/worker.js",
+  "main": "cf-worker.mjs",
   "compatibility_date": "2026-11-19",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
+  // Keeps the first free download server awake (see cf-worker.mjs).
+  "triggers": { "crons": ["*/10 * * * *"] },
   "observability": { "enabled": true },
   "workers_dev": true,
   // Custom domain (zone flexdow.xyz is on this Cloudflare account).
